@@ -1,4 +1,4 @@
-// Contribution Blaster Arcade Game & Tactical Nuke Engine
+// Contribution Blaster Arcade Game & Real GitHub Heatmap Engine
 
 class ContributionBlaster {
     constructor() {
@@ -8,10 +8,13 @@ class ContributionBlaster {
         this.gunSvg = document.getElementById('blaster-gun');
         this.scoreEl = document.getElementById('blaster-score');
         this.streakEl = document.getElementById('blaster-streak');
+        this.totalCommitsEl = document.getElementById('blaster-total-commits');
         this.autoBtn = document.getElementById('auto-blast-btn');
+        this.replayBtn = document.getElementById('replay-timeline-btn');
         this.soundBtn = document.getElementById('sound-toggle-btn');
         this.clearBtn = document.getElementById('clear-grid-btn');
         this.nukeBtn = document.getElementById('nuke-strike-btn');
+        this.tooltipEl = document.getElementById('blaster-tooltip');
 
         if (!this.container || !this.gridEl || !this.canvas || !this.gunSvg) return;
 
@@ -25,27 +28,45 @@ class ContributionBlaster {
 
         this.score = 0;
         this.streak = 0;
+        this.totalCommits = 522;
         this.soundEnabled = true;
         this.autoBlastActive = false;
+        this.replayActive = false;
         this.nukeInProgress = false;
         this.autoBlastInterval = null;
+        this.replayTimeout = null;
         this.audioCtx = null;
 
         this.targetAngle = 0;
         this.currentAngle = 0;
         this.gunOrigin = { x: 0, y: 0 };
+        this.realContributions = null;
+        this.cells = [];
 
         this.init();
     }
 
-    init() {
+    async init() {
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
 
+        await this.loadContributionData();
         this.renderHeatmap();
         this.initAudio();
         this.bindEvents();
         this.loop();
+    }
+
+    async loadContributionData() {
+        try {
+            const resp = await fetch('contributions.json');
+            if (resp.ok) {
+                this.realContributions = await resp.json();
+                this.totalCommits = this.realContributions.totalContributions || 522;
+            }
+        } catch (e) {
+            console.warn('Using fallback contribution generator', e);
+        }
     }
 
     initAudio() {
@@ -166,40 +187,95 @@ class ContributionBlaster {
 
     renderHeatmap() {
         this.gridEl.innerHTML = '';
-        const weeks = 36;
-        const days = 7;
         this.cells = [];
 
-        for (let w = 0; w < weeks; w++) {
-            const col = document.createElement('div');
-            col.className = 'flex flex-col gap-1.5';
-            for (let d = 0; d < days; d++) {
-                const cell = document.createElement('div');
-                cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm bg-slate-800 transition-all duration-300 hover:scale-125 cursor-crosshair border border-slate-700/50 relative';
-                cell.dataset.level = '0';
-                cell.dataset.x = w;
-                cell.dataset.y = d;
-                
-                // Initial realistic scatter
-                if (Math.random() > 0.6) {
-                    const level = Math.floor(Math.random() * 3) + 1;
-                    this.applyCellLevel(cell, level);
-                }
-
-                col.appendChild(cell);
-                this.cells.push(cell);
+        if (this.realContributions && this.realContributions.days) {
+            // Render Real GitHub 53-Week Heatmap Matrix
+            const days = this.realContributions.days;
+            const weeksCount = this.realContributions.weeksCount || 53;
+            
+            // Group by week
+            const weeksMap = {};
+            for (const d of days) {
+                if (!weeksMap[d.week]) weeksMap[d.week] = [];
+                weeksMap[d.week].push(d);
             }
-            this.gridEl.appendChild(col);
+
+            for (let w = 0; w < weeksCount; w++) {
+                const col = document.createElement('div');
+                col.className = 'flex flex-col gap-1.5 shrink-0';
+                const weekDays = weeksMap[w] || [];
+
+                for (const d of weekDays) {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm transition-all duration-300 hover:scale-125 cursor-crosshair relative';
+                    cell.dataset.date = d.date;
+                    cell.dataset.count = d.count;
+                    cell.dataset.level = d.level;
+                    cell.dataset.originalLevel = d.level;
+
+                    this.applyCellLevel(cell, d.level);
+
+                    // Add Tooltip Hover Listeners
+                    cell.addEventListener('mouseenter', (e) => this.showTooltip(e, d));
+                    cell.addEventListener('mouseleave', () => this.hideTooltip());
+
+                    col.appendChild(cell);
+                    this.cells.push(cell);
+                }
+                this.gridEl.appendChild(col);
+            }
+        } else {
+            // Fallback render
+            for (let w = 0; w < 40; w++) {
+                const col = document.createElement('div');
+                col.className = 'flex flex-col gap-1.5 shrink-0';
+                for (let d = 0; d < 7; d++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm bg-slate-800 transition-all duration-300 hover:scale-125 cursor-crosshair border border-slate-700/50 relative';
+                    cell.dataset.level = '0';
+                    if (Math.random() > 0.6) {
+                        this.applyCellLevel(cell, Math.floor(Math.random() * 3) + 1);
+                    }
+                    col.appendChild(cell);
+                    this.cells.push(cell);
+                }
+                this.gridEl.appendChild(col);
+            }
+        }
+
+        if (this.totalCommitsEl) {
+            this.totalCommitsEl.textContent = `${this.totalCommits} Commits in 2026`;
         }
     }
 
     applyCellLevel(cell, level) {
         cell.dataset.level = level;
         cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm transition-all duration-300 hover:scale-125 cursor-crosshair relative';
-        if (level === 1) cell.classList.add('bg-emerald-900', 'border', 'border-emerald-800');
+        if (level === 0) cell.classList.add('bg-slate-800/80', 'border', 'border-slate-700/50');
+        else if (level === 1) cell.classList.add('bg-emerald-900', 'border', 'border-emerald-800');
         else if (level === 2) cell.classList.add('bg-emerald-600', 'border', 'border-emerald-500', 'shadow-sm', 'shadow-emerald-500/50');
         else if (level === 3) cell.classList.add('bg-emerald-400', 'border', 'border-emerald-300', 'shadow-md', 'shadow-emerald-400');
         else if (level >= 4) cell.classList.add('bg-green-300', 'border', 'border-white', 'shadow-lg', 'shadow-green-300', 'animate-pulse');
+    }
+
+    showTooltip(e, data) {
+        if (!this.tooltipEl) return;
+        const rect = e.target.getBoundingClientRect();
+        const containerRect = this.container.getBoundingClientRect();
+        
+        const countText = data.count === 1 ? '1 contribution' : `${data.count} contributions`;
+        this.tooltipEl.innerHTML = `<strong>${countText}</strong> on ${data.date}`;
+        this.tooltipEl.style.left = `${rect.left + rect.width / 2 - containerRect.left}px`;
+        this.tooltipEl.style.top = `${rect.top - containerRect.top - 32}px`;
+        this.tooltipEl.classList.remove('opacity-0');
+        this.tooltipEl.classList.add('opacity-100');
+    }
+
+    hideTooltip() {
+        if (!this.tooltipEl) return;
+        this.tooltipEl.classList.add('opacity-0');
+        this.tooltipEl.classList.remove('opacity-100');
     }
 
     bindEvents() {
@@ -224,6 +300,10 @@ class ContributionBlaster {
             this.nukeBtn.addEventListener('click', () => this.launchTacticalNuke());
         }
 
+        if (this.replayBtn) {
+            this.replayBtn.addEventListener('click', () => this.toggleTimelineReplay());
+        }
+
         if (this.autoBtn) {
             this.autoBtn.addEventListener('click', () => {
                 this.autoBlastActive = !this.autoBlastActive;
@@ -233,7 +313,9 @@ class ContributionBlaster {
 
                 if (this.autoBlastActive) {
                     this.autoBlastInterval = setInterval(() => {
-                        const randomCell = this.cells[Math.floor(Math.random() * this.cells.length)];
+                        const activeCells = this.cells.filter(c => parseInt(c.dataset.count || '0') > 0);
+                        const pool = activeCells.length > 0 ? activeCells : this.cells;
+                        const randomCell = pool[Math.floor(Math.random() * pool.length)];
                         if (randomCell) {
                             const rect = randomCell.getBoundingClientRect();
                             const containerRect = this.container.getBoundingClientRect();
@@ -245,7 +327,7 @@ class ContributionBlaster {
                             this.targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
                             this.shoot(targetX, targetY);
                         }
-                    }, 240);
+                    }, 220);
                 } else {
                     clearInterval(this.autoBlastInterval);
                 }
@@ -262,8 +344,8 @@ class ContributionBlaster {
         if (this.clearBtn) {
             this.clearBtn.addEventListener('click', () => {
                 this.cells.forEach(cell => {
-                    cell.dataset.level = '0';
-                    cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm bg-slate-800 transition-all duration-300 hover:scale-125 cursor-crosshair border border-slate-700/50 relative';
+                    const orig = parseInt(cell.dataset.originalLevel || '0');
+                    this.applyCellLevel(cell, orig);
                 });
                 this.score = 0;
                 this.streak = 0;
@@ -272,9 +354,56 @@ class ContributionBlaster {
         }
     }
 
+    // ⏱️ TIMELINE REPLAY: Chronologically shoot real commit dates from Jan to Today
+    toggleTimelineReplay() {
+        if (this.replayActive) {
+            this.replayActive = false;
+            if (this.replayTimeout) clearTimeout(this.replayTimeout);
+            this.replayBtn.textContent = '⏱️ Timeline Replay';
+            this.replayBtn.classList.remove('bg-purple-600');
+            return;
+        }
+
+        this.replayActive = true;
+        this.replayBtn.textContent = '⏹️ Stop Replay';
+        this.replayBtn.classList.add('bg-purple-600');
+
+        // Reset grid to 0
+        this.cells.forEach(c => this.applyCellLevel(c, 0));
+
+        // Get all dates with actual commits
+        const commitCells = this.cells.filter(c => parseInt(c.dataset.count || '0') > 0);
+        let idx = 0;
+
+        const playNext = () => {
+            if (!this.replayActive || idx >= commitCells.length) {
+                this.replayActive = false;
+                this.replayBtn.textContent = '⏱️ Timeline Replay';
+                this.replayBtn.classList.remove('bg-purple-600');
+                return;
+            }
+
+            const cell = commitCells[idx];
+            const rect = cell.getBoundingClientRect();
+            const containerRect = this.container.getBoundingClientRect();
+            const targetX = rect.left + rect.width / 2 - containerRect.left;
+            const targetY = rect.top + rect.height / 2 - containerRect.top;
+
+            const dx = targetX - this.gunOrigin.x;
+            const dy = targetY - this.gunOrigin.y;
+            this.targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
+            this.shoot(targetX, targetY);
+
+            idx++;
+            this.replayTimeout = setTimeout(playNext, 120);
+        };
+
+        playNext();
+    }
+
     shoot(targetX, targetY) {
         const angle = Math.atan2(targetY - this.gunOrigin.y, targetX - this.gunOrigin.x);
-        const speed = 14;
+        const speed = 15;
         
         this.projectiles.push({
             x: this.gunOrigin.x,
@@ -292,28 +421,24 @@ class ContributionBlaster {
         this.playLaserSound();
     }
 
-    // 🚀 THE TACTICAL NUKE STRIKE SEQUENCE
+    // 🚀 TACTICAL NUKE: Specifically seek & detonate on top peak commit milestone days
     launchTacticalNuke() {
         if (this.nukeInProgress) return;
         this.nukeInProgress = true;
         this.nukeBtn.disabled = true;
         this.nukeBtn.classList.add('opacity-50', 'animate-pulse');
 
-        // Step 1: Find all green contribution target boxes
-        let targetCells = this.cells.filter(c => parseInt(c.dataset.level || '0') > 0);
-        if (targetCells.length < 12) {
-            // Pick a good cluster of 20 targets if heatmap is sparse
-            targetCells = [];
-            for (let i = 0; i < 24; i++) {
-                targetCells.push(this.cells[Math.floor(Math.random() * this.cells.length)]);
-            }
-        }
+        // Find top peak commit milestone days (sorted by commit count descending)
+        const sorted = [...this.cells].sort((a, b) => {
+            return parseInt(b.dataset.count || '0') - parseInt(a.dataset.count || '0');
+        });
+        const peakTargets = sorted.slice(0, 18);
 
         const containerRect = this.container.getBoundingClientRect();
         this.targetLocks = [];
 
-        // Step 2: Target Painting Sequence (snapping [X] lock-ons with radar beeps)
-        targetCells.forEach((cell, idx) => {
+        // Target painting on milestone days
+        peakTargets.forEach((cell, idx) => {
             setTimeout(() => {
                 const cellRect = cell.getBoundingClientRect();
                 const tx = cellRect.left + cellRect.width / 2 - containerRect.left;
@@ -323,25 +448,24 @@ class ContributionBlaster {
                     x: tx,
                     y: ty,
                     cell: cell,
-                    scale: 1,
-                    alpha: 1
+                    date: cell.dataset.date,
+                    count: cell.dataset.count
                 });
                 this.playRadarBeep();
-            }, idx * 45);
+            }, idx * 50);
         });
 
-        // Step 3: Launch Tactical Cruise Missiles after all targets are locked
-        const launchDelay = targetCells.length * 45 + 300;
+        // Launch ballistic cruise missiles
+        const launchDelay = peakTargets.length * 50 + 300;
         setTimeout(() => {
             this.playRocketLaunchSound();
             
-            // Multiple rocket battery launch points at the bottom
-            targetCells.forEach((cell, idx) => {
+            peakTargets.forEach((cell, idx) => {
                 setTimeout(() => {
                     const cellRect = cell.getBoundingClientRect();
                     const tx = cellRect.left + cellRect.width / 2 - containerRect.left;
                     const ty = cellRect.top + cellRect.height / 2 - containerRect.top;
-                    const startX = this.gunOrigin.x + (Math.random() * 120 - 60);
+                    const startX = this.gunOrigin.x + (Math.random() * 140 - 70);
                     const startY = this.gunOrigin.y;
 
                     this.missiles.push({
@@ -352,24 +476,25 @@ class ContributionBlaster {
                         targetX: tx,
                         targetY: ty,
                         cell: cell,
+                        date: cell.dataset.date,
+                        count: cell.dataset.count,
                         progress: 0,
-                        speed: 0.035 + Math.random() * 0.015,
-                        arcHeight: Math.random() * 140 + 80,
+                        speed: 0.032 + Math.random() * 0.015,
+                        arcHeight: Math.random() * 150 + 80,
                         trail: []
                     });
                 }, idx * 60);
             });
         }, launchDelay);
 
-        // Reset Nuke button after volley completes
         setTimeout(() => {
             this.nukeInProgress = false;
             this.nukeBtn.disabled = false;
             this.nukeBtn.classList.remove('opacity-50', 'animate-pulse');
-        }, launchDelay + targetCells.length * 60 + 1500);
+        }, launchDelay + peakTargets.length * 60 + 1500);
     }
 
-    spawnImpact(x, y, isCellHit = false) {
+    spawnImpact(x, y, isCellHit = false, cell = null) {
         const colors = ['#4ade80', '#22c55e', '#38bdf8', '#fbbf24', '#f43f5e'];
         for (let i = 0; i < 14; i++) {
             const angle = Math.random() * Math.PI * 2;
@@ -387,40 +512,39 @@ class ContributionBlaster {
         }
 
         if (isCellHit) {
-            const badges = ['+10 Commits!', 'PR Merged! 🔥', 'Bug Squashed! 🐛', 'Streak x2! ⚡', 'Critical Fix! 🚀'];
-            const text = badges[Math.floor(Math.random() * badges.length)];
+            const count = cell ? parseInt(cell.dataset.count || '1') : 1;
+            const date = cell ? cell.dataset.date : '';
+            const text = count > 0 ? `+${count} Commits! 🔥` : '+10 XP! ✨';
+
             this.floatingTexts.push({
                 x: x + (Math.random() * 20 - 10),
                 y,
-                text,
+                text: date ? `${date}: ${text}` : text,
                 alpha: 1,
                 vy: -1.5,
                 color: '#4ade80'
             });
 
-            this.score += 50;
+            this.score += count * 50 + 10;
             this.streak += 1;
             this.updateStats();
             this.playPopSound();
         }
     }
 
-    triggerNukeDetonation(x, y, cell) {
-        // Heavy Screen Shake
+    triggerNukeDetonation(x, y, cell, count, date) {
         this.container.classList.add('shake-active');
         setTimeout(() => this.container.classList.remove('shake-active'), 350);
 
-        // Shockwave Ring
         this.shockwaves.push({
             x,
             y,
             radius: 4,
-            maxRadius: 40,
+            maxRadius: 45,
             alpha: 1,
             color: '#22c55e'
         });
 
-        // Massive Fireball Particles
         const nukeColors = ['#ffffff', '#86efac', '#4ade80', '#22c55e', '#38bdf8', '#facc15', '#ef4444'];
         for (let i = 0; i < 28; i++) {
             const angle = Math.random() * Math.PI * 2;
@@ -437,23 +561,23 @@ class ContributionBlaster {
             });
         }
 
-        // Supercharge cell to Level 4 (Pulsing Emerald Neon)
         if (cell) {
             this.applyCellLevel(cell, 4);
         }
 
-        // Mega Floating Text
-        const nukeBadges = ['💥 TACTICAL STRIKE! +500 XP', '🔥 NUCLEAR STREAK!', '🚀 100% DEPLOYED!', '⚡ OVERLOAD!'];
+        const commitsCount = count ? parseInt(count) : 20;
+        const text = date ? `💥 ${date}: +${commitsCount} COMMITS!` : `💥 PEAK MILESTONE! +${commitsCount} XP`;
+
         this.floatingTexts.push({
-            x: x - 20,
+            x: x - 30,
             y: y - 10,
-            text: nukeBadges[Math.floor(Math.random() * nukeBadges.length)],
+            text,
             alpha: 1,
             vy: -2,
             color: '#facc15'
         });
 
-        this.score += 500;
+        this.score += commitsCount * 100 + 500;
         this.streak += 5;
         this.updateStats();
         this.playHeavyExplosionSound();
@@ -471,7 +595,6 @@ class ContributionBlaster {
         this.currentAngle += (this.targetAngle - this.currentAngle) * 0.2;
         this.gunSvg.style.transform = `rotate(${this.currentAngle * (180 / Math.PI)}deg)`;
 
-        // Clear Canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // 1. Draw Target Lock-On Markers [ X ]
@@ -481,10 +604,9 @@ class ContributionBlaster {
             this.ctx.strokeStyle = '#ef4444';
             this.ctx.lineWidth = 1.5;
             this.ctx.fillStyle = '#ef4444';
-            this.ctx.font = 'bold 10px monospace';
+            this.ctx.font = 'bold 9px monospace';
 
             const size = 9;
-            // Draw [ X ] brackets
             this.ctx.strokeRect(lock.x - size, lock.y - size, size * 2, size * 2);
             this.ctx.beginPath();
             this.ctx.moveTo(lock.x - 4, lock.y - 4);
@@ -493,7 +615,7 @@ class ContributionBlaster {
             this.ctx.lineTo(lock.x - 4, lock.y + 4);
             this.ctx.stroke();
 
-            this.ctx.fillText('TARGET', lock.x - 18, lock.y - 12);
+            this.ctx.fillText(`${lock.count || '0'} COMMITS`, lock.x - 22, lock.y - 12);
             this.ctx.restore();
         }
 
@@ -502,18 +624,15 @@ class ContributionBlaster {
             const m = this.missiles[i];
             m.progress += m.speed;
 
-            // Parabolic Bezier trajectory
             const currentX = m.startX + (m.targetX - m.startX) * m.progress;
             const linearY = m.startY + (m.targetY - m.startY) * m.progress;
             const arcOffset = Math.sin(m.progress * Math.PI) * m.arcHeight;
             m.x = currentX;
             m.y = linearY - arcOffset;
 
-            // Smoke & Thruster Trail
             m.trail.push({ x: m.x, y: m.y });
             if (m.trail.length > 10) m.trail.shift();
 
-            // Draw Smoke Trail
             this.ctx.beginPath();
             for (let j = 0; j < m.trail.length; j++) {
                 const pt = m.trail[j];
@@ -523,7 +642,6 @@ class ContributionBlaster {
             this.ctx.lineWidth = 3;
             this.ctx.stroke();
 
-            // Draw Missile Rocket Body
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(m.x, m.y, 4.5, 0, Math.PI * 2);
@@ -533,7 +651,6 @@ class ContributionBlaster {
             this.ctx.fill();
             this.ctx.restore();
 
-            // Spawn engine sparks
             if (Math.random() > 0.4) {
                 this.particles.push({
                     x: m.x,
@@ -547,10 +664,8 @@ class ContributionBlaster {
                 });
             }
 
-            // Impact check
             if (m.progress >= 1) {
-                this.triggerNukeDetonation(m.targetX, m.targetY, m.cell);
-                // Remove lock marker for this cell
+                this.triggerNukeDetonation(m.targetX, m.targetY, m.cell, m.count, m.date);
                 this.targetLocks = this.targetLocks.filter(l => l.cell !== m.cell);
                 this.missiles.splice(i, 1);
             }
@@ -595,7 +710,7 @@ class ContributionBlaster {
                     const currentLevel = parseInt(cell.dataset.level || '0');
                     const nextLevel = Math.min(currentLevel + 1, 4);
                     this.applyCellLevel(cell, nextLevel);
-                    this.spawnImpact(cellX, cellY, true);
+                    this.spawnImpact(cellX, cellY, true, cell);
                     hit = true;
                     break;
                 }
@@ -661,7 +776,7 @@ class ContributionBlaster {
 
             this.ctx.save();
             this.ctx.globalAlpha = t.alpha;
-            this.ctx.font = 'bold 12px Inter, sans-serif';
+            this.ctx.font = 'bold 11px Inter, sans-serif';
             this.ctx.fillStyle = t.color || '#4ade80';
             this.ctx.shadowColor = '#000';
             this.ctx.shadowBlur = 6;
