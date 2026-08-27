@@ -244,7 +244,7 @@ class ContributionBlaster {
         }
 
         if (this.totalCommitsEl) {
-            this.totalCommitsEl.textContent = `${this.totalCommits} Commits in 2026`;
+            this.totalCommitsEl.textContent = `${this.totalCommits} Total Contributions`;
         }
     }
 
@@ -367,13 +367,13 @@ class ContributionBlaster {
                 this.streak = 0;
                 this.updateStats();
                 if (this.totalCommitsEl) {
-                    this.totalCommitsEl.textContent = `${this.totalCommits} Commits in 2026`;
+                    this.totalCommitsEl.textContent = `${this.totalCommits} Total Contributions`;
                 }
             });
         }
     }
 
-    // ⏱️ ACCURATE TIMELINE REPLAY: Chronologically sweeps through 2026 commits
+    // ⏱️ ACCURATE TIMELINE REPLAY: Chronologically sweeps through full calendar
     toggleTimelineReplay() {
         if (this.replayActive) {
             this.replayActive = false;
@@ -407,7 +407,7 @@ class ContributionBlaster {
                 this.replayBtn.textContent = '⏱️ Timeline Replay';
                 this.replayBtn.classList.remove('bg-purple-600');
                 if (this.totalCommitsEl) {
-                    this.totalCommitsEl.textContent = `✅ 521/521 Commits Replayed!`;
+                    this.totalCommitsEl.textContent = `✅ ${this.totalCommits}/${this.totalCommits} Contributions Replayed!`;
                 }
                 return;
             }
@@ -433,7 +433,7 @@ class ContributionBlaster {
             // Update running commits HUD
             this.runningCommits += count;
             if (this.totalCommitsEl) {
-                this.totalCommitsEl.textContent = `📅 ${date}: +${count} (${this.runningCommits}/521 Commits)`;
+                this.totalCommitsEl.textContent = `📅 ${date}: +${count} (${this.runningCommits}/${this.totalCommits} Commits)`;
             }
 
             idx++;
