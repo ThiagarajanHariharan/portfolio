@@ -28,7 +28,7 @@ class ContributionBlaster {
 
         this.score = 0;
         this.streak = 0;
-        this.totalCommits = 522;
+        this.totalCommits = 521;
         this.soundEnabled = true;
         this.autoBlastActive = false;
         this.replayActive = false;
