@@ -29,6 +29,7 @@ class ContributionBlaster {
         this.score = 0;
         this.streak = 0;
         this.totalCommits = 521;
+        this.runningCommits = 0;
         this.soundEnabled = true;
         this.autoBlastActive = false;
         this.replayActive = false;
@@ -62,7 +63,7 @@ class ContributionBlaster {
             const resp = await fetch('contributions.json');
             if (resp.ok) {
                 this.realContributions = await resp.json();
-                this.totalCommits = this.realContributions.totalContributions || 522;
+                this.totalCommits = this.realContributions.totalContributions || 521;
             }
         } catch (e) {
             console.warn('Using fallback contribution generator', e);
@@ -190,11 +191,10 @@ class ContributionBlaster {
         this.cells = [];
 
         if (this.realContributions && this.realContributions.days) {
-            // Render Real GitHub 53-Week Heatmap Matrix
+            // Render Real 2026 GitHub Heatmap
             const days = this.realContributions.days;
-            const weeksCount = this.realContributions.weeksCount || 53;
+            const weeksCount = this.realContributions.weeksCount || 35;
             
-            // Group by week
             const weeksMap = {};
             for (const d of days) {
                 if (!weeksMap[d.week]) weeksMap[d.week] = [];
@@ -216,7 +216,6 @@ class ContributionBlaster {
 
                     this.applyCellLevel(cell, d.level);
 
-                    // Add Tooltip Hover Listeners
                     cell.addEventListener('mouseenter', (e) => this.showTooltip(e, d));
                     cell.addEventListener('mouseleave', () => this.hideTooltip());
 
@@ -226,8 +225,8 @@ class ContributionBlaster {
                 this.gridEl.appendChild(col);
             }
         } else {
-            // Fallback render
-            for (let w = 0; w < 40; w++) {
+            // Fallback
+            for (let w = 0; w < 35; w++) {
                 const col = document.createElement('div');
                 col.className = 'flex flex-col gap-1.5 shrink-0';
                 for (let d = 0; d < 7; d++) {
@@ -280,6 +279,7 @@ class ContributionBlaster {
 
     bindEvents() {
         this.container.addEventListener('mousemove', (e) => {
+            if (this.replayActive) return; // Don't override gun aim during replay
             const rect = this.container.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
@@ -293,7 +293,22 @@ class ContributionBlaster {
             const rect = this.container.getBoundingClientRect();
             const targetX = e.clientX - rect.left;
             const targetY = e.clientY - rect.top;
-            this.shoot(targetX, targetY);
+
+            // Find closest cell to click
+            let closestCell = null;
+            let minDist = 999;
+            for (const cell of this.cells) {
+                const cellRect = cell.getBoundingClientRect();
+                const cellX = cellRect.left + cellRect.width / 2 - rect.left;
+                const cellY = cellRect.top + cellRect.height / 2 - rect.top;
+                const d = Math.hypot(targetX - cellX, targetY - cellY);
+                if (d < minDist) {
+                    minDist = d;
+                    closestCell = cell;
+                }
+            }
+
+            this.shoot(targetX, targetY, closestCell);
         });
 
         if (this.nukeBtn) {
@@ -325,7 +340,7 @@ class ContributionBlaster {
                             const dx = targetX - this.gunOrigin.x;
                             const dy = targetY - this.gunOrigin.y;
                             this.targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
-                            this.shoot(targetX, targetY);
+                            this.shoot(targetX, targetY, randomCell);
                         }
                     }, 220);
                 } else {
@@ -343,6 +358,7 @@ class ContributionBlaster {
 
         if (this.clearBtn) {
             this.clearBtn.addEventListener('click', () => {
+                if (this.replayActive) this.toggleTimelineReplay();
                 this.cells.forEach(cell => {
                     const orig = parseInt(cell.dataset.originalLevel || '0');
                     this.applyCellLevel(cell, orig);
@@ -350,11 +366,14 @@ class ContributionBlaster {
                 this.score = 0;
                 this.streak = 0;
                 this.updateStats();
+                if (this.totalCommitsEl) {
+                    this.totalCommitsEl.textContent = `${this.totalCommits} Commits in 2026`;
+                }
             });
         }
     }
 
-    // ⏱️ TIMELINE REPLAY: Chronologically shoot real commit dates from Jan to Today
+    // ⏱️ ACCURATE TIMELINE REPLAY: Chronologically sweeps through 2026 commits
     toggleTimelineReplay() {
         if (this.replayActive) {
             this.replayActive = false;
@@ -368,11 +387,18 @@ class ContributionBlaster {
         this.replayBtn.textContent = '⏹️ Stop Replay';
         this.replayBtn.classList.add('bg-purple-600');
 
-        // Reset grid to 0
+        // Reset entire grid to 0
         this.cells.forEach(c => this.applyCellLevel(c, 0));
+        this.runningCommits = 0;
+        this.score = 0;
+        this.streak = 0;
+        this.updateStats();
 
-        // Get all dates with actual commits
-        const commitCells = this.cells.filter(c => parseInt(c.dataset.count || '0') > 0);
+        // Get strictly chronological active commit days
+        const commitCells = this.cells
+            .filter(c => parseInt(c.dataset.count || '0') > 0)
+            .sort((a, b) => a.dataset.date.localeCompare(b.dataset.date));
+
         let idx = 0;
 
         const playNext = () => {
@@ -380,30 +406,46 @@ class ContributionBlaster {
                 this.replayActive = false;
                 this.replayBtn.textContent = '⏱️ Timeline Replay';
                 this.replayBtn.classList.remove('bg-purple-600');
+                if (this.totalCommitsEl) {
+                    this.totalCommitsEl.textContent = `✅ 521/521 Commits Replayed!`;
+                }
                 return;
             }
 
             const cell = commitCells[idx];
+            const origLevel = parseInt(cell.dataset.originalLevel || '1');
+            const count = parseInt(cell.dataset.count || '1');
+            const date = cell.dataset.date;
+
             const rect = cell.getBoundingClientRect();
             const containerRect = this.container.getBoundingClientRect();
             const targetX = rect.left + rect.width / 2 - containerRect.left;
             const targetY = rect.top + rect.height / 2 - containerRect.top;
 
+            // Instantly snap and aim gun at target
             const dx = targetX - this.gunOrigin.x;
             const dy = targetY - this.gunOrigin.y;
             this.targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
-            this.shoot(targetX, targetY);
+
+            // Shoot target-locked laser with exact level
+            this.shoot(targetX, targetY, cell, origLevel);
+
+            // Update running commits HUD
+            this.runningCommits += count;
+            if (this.totalCommitsEl) {
+                this.totalCommitsEl.textContent = `📅 ${date}: +${count} (${this.runningCommits}/521 Commits)`;
+            }
 
             idx++;
-            this.replayTimeout = setTimeout(playNext, 120);
+            this.replayTimeout = setTimeout(playNext, 140);
         };
 
         playNext();
     }
 
-    shoot(targetX, targetY) {
+    shoot(targetX, targetY, targetCell = null, exactLevel = null) {
         const angle = Math.atan2(targetY - this.gunOrigin.y, targetX - this.gunOrigin.x);
-        const speed = 15;
+        const speed = 16;
         
         this.projectiles.push({
             x: this.gunOrigin.x,
@@ -412,6 +454,8 @@ class ContributionBlaster {
             vy: Math.sin(angle) * speed,
             targetX,
             targetY,
+            targetCell,
+            exactLevel,
             color: '#38bdf8',
             trail: []
         });
@@ -432,7 +476,7 @@ class ContributionBlaster {
         const sorted = [...this.cells].sort((a, b) => {
             return parseInt(b.dataset.count || '0') - parseInt(a.dataset.count || '0');
         });
-        const peakTargets = sorted.slice(0, 18);
+        const peakTargets = sorted.slice(0, 16);
 
         const containerRect = this.container.getBoundingClientRect();
         this.targetLocks = [];
@@ -494,7 +538,7 @@ class ContributionBlaster {
         }, launchDelay + peakTargets.length * 60 + 1500);
     }
 
-    spawnImpact(x, y, isCellHit = false, cell = null) {
+    spawnImpact(x, y, isCellHit = false, cell = null, exactLevel = null) {
         const colors = ['#4ade80', '#22c55e', '#38bdf8', '#fbbf24', '#f43f5e'];
         for (let i = 0; i < 14; i++) {
             const angle = Math.random() * Math.PI * 2;
@@ -511,15 +555,20 @@ class ContributionBlaster {
             });
         }
 
-        if (isCellHit) {
-            const count = cell ? parseInt(cell.dataset.count || '1') : 1;
-            const date = cell ? cell.dataset.date : '';
-            const text = count > 0 ? `+${count} Commits! 🔥` : '+10 XP! ✨';
+        if (isCellHit && cell) {
+            const count = parseInt(cell.dataset.count || '1');
+            const date = cell.dataset.date;
+            
+            // Set exact level if provided, otherwise increment
+            const targetLevel = exactLevel !== null ? exactLevel : Math.min(parseInt(cell.dataset.level || '0') + 1, 4);
+            this.applyCellLevel(cell, targetLevel);
+
+            const text = count > 0 ? `${date}: +${count} Commits! 🔥` : '+10 XP! ✨';
 
             this.floatingTexts.push({
                 x: x + (Math.random() * 20 - 10),
                 y,
-                text: date ? `${date}: ${text}` : text,
+                text,
                 alpha: 1,
                 vy: -1.5,
                 color: '#4ade80'
@@ -592,7 +641,7 @@ class ContributionBlaster {
         requestAnimationFrame(() => this.loop());
 
         // Gun Rotation
-        this.currentAngle += (this.targetAngle - this.currentAngle) * 0.2;
+        this.currentAngle += (this.targetAngle - this.currentAngle) * 0.25;
         this.gunSvg.style.transform = `rotate(${this.currentAngle * (180 / Math.PI)}deg)`;
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -671,7 +720,7 @@ class ContributionBlaster {
             }
         }
 
-        // 3. Update Standard Projectiles
+        // 3. Update Standard Projectiles (Target-locked & accurate)
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
             p.x += p.vx;
@@ -697,27 +746,17 @@ class ContributionBlaster {
             this.ctx.fill();
             this.ctx.shadowBlur = 0;
 
-            const containerRect = this.container.getBoundingClientRect();
-            let hit = false;
-
-            for (const cell of this.cells) {
-                const cellRect = cell.getBoundingClientRect();
-                const cellX = cellRect.left + cellRect.width / 2 - containerRect.left;
-                const cellY = cellRect.top + cellRect.height / 2 - containerRect.top;
-
-                const dist = Math.hypot(p.x - cellX, p.y - cellY);
-                if (dist < 12) {
-                    const currentLevel = parseInt(cell.dataset.level || '0');
-                    const nextLevel = Math.min(currentLevel + 1, 4);
-                    this.applyCellLevel(cell, nextLevel);
-                    this.spawnImpact(cellX, cellY, true, cell);
-                    hit = true;
-                    break;
+            const distToTarget = Math.hypot(p.x - p.targetX, p.y - p.targetY);
+            
+            // Check arrival at intended destination
+            if (distToTarget < 15 || p.y <= p.targetY) {
+                if (p.targetCell) {
+                    this.spawnImpact(p.targetX, p.targetY, true, p.targetCell, p.exactLevel);
+                } else {
+                    this.spawnImpact(p.targetX, p.targetY, false);
                 }
-            }
-
-            if (hit || p.y < 0 || p.x < 0 || p.x > this.canvas.width || p.y > this.canvas.height) {
-                if (!hit) this.spawnImpact(p.x, p.y, false);
+                this.projectiles.splice(i, 1);
+            } else if (p.y < 0 || p.x < 0 || p.x > this.canvas.width || p.y > this.canvas.height) {
                 this.projectiles.splice(i, 1);
             }
         }
