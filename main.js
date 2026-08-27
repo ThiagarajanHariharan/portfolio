@@ -242,8 +242,14 @@ class ContributionBlaster {
 
     resizeCanvas() {
         const rect = this.container.getBoundingClientRect();
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.dpr = dpr;
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+        this.canvas.style.width = `${rect.width}px`;
+        this.canvas.style.height = `${rect.height}px`;
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
         this.gunOrigin = {
             x: rect.width / 2,
             y: rect.height - 35
@@ -274,10 +280,10 @@ class ContributionBlaster {
 
                 for (const d of weekDays) {
                     const cell = document.createElement('div');
-                    cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm transition-all duration-300 hover:scale-125 cursor-crosshair relative';
+                    cell.className = 'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-sm transition-all duration-300 hover:scale-125 cursor-crosshair relative focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 focus:ring-offset-slate-900';
                     cell.setAttribute('role', 'gridcell');
                     cell.setAttribute('tabindex', '0');
-                    cell.setAttribute('aria-label', `${d.date}: ${d.count} contributions`);
+                    cell.setAttribute('aria-label', `${d.date}: ${d.count} contributions. Press Enter or Space to blast.`);
                     
                     cell.dataset.date = d.date;
                     cell.dataset.count = d.count;
@@ -290,6 +296,21 @@ class ContributionBlaster {
                     cell.addEventListener('mouseleave', () => this.hideTooltip());
                     cell.addEventListener('focus', (e) => this.showTooltip(e, d));
                     cell.addEventListener('blur', () => this.hideTooltip());
+
+                    // ♿ Keyboard Shooting Controls
+                    cell.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            const cellRect = cell.getBoundingClientRect();
+                            const containerRect = this.container.getBoundingClientRect();
+                            const tx = cellRect.left + cellRect.width / 2 - containerRect.left;
+                            const ty = cellRect.top + cellRect.height / 2 - containerRect.top;
+                            const dx = tx - this.gunOrigin.x;
+                            const dy = ty - this.gunOrigin.y;
+                            this.targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
+                            this.shoot(tx, ty, cell);
+                        }
+                    });
 
                     col.appendChild(cell);
                     this.cells.push(cell);
