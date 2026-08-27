@@ -35,9 +35,15 @@
             
             <div class="flex flex-wrap items-center gap-3">
                 <div class="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs font-mono flex items-center gap-3">
+                    <span class="text-emerald-400 font-bold" id="blaster-total-commits">522 Commits</span>
+                    <span class="text-slate-600">|</span>
                     <span>SCORE: <strong id="blaster-score" class="text-emerald-400">0</strong></span>
+                    <span class="text-slate-600">|</span>
                     <span>STREAK: <strong id="blaster-streak" class="text-cyan-400">0</strong>🔥</span>
                 </div>
+                <button id="replay-timeline-btn" class="bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg border border-purple-500 shadow-md shadow-purple-500/20 transition-all flex items-center gap-1 active:scale-95">
+                    ⏱️ REPLAY
+                </button>
                 <button id="nuke-strike-btn" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg border border-red-500 shadow-md shadow-red-500/30 transition-all flex items-center gap-1 active:scale-95">
                     🚀 TACTICAL NUKE
                 </button>
@@ -51,13 +57,16 @@
         </div>
 
         <!-- Arcade Viewport -->
-        <div id="blaster-container" class="relative w-full h-[420px] bg-slate-950/80 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between p-4 cursor-crosshair select-none">
+        <div id="blaster-container" class="relative w-full h-[440px] bg-slate-950/80 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between p-4 cursor-crosshair select-none">
             
+            <!-- Hover Tooltip -->
+            <div id="blaster-tooltip" class="absolute z-30 pointer-events-none -translate-x-1/2 bg-slate-950/95 border border-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg shadow-xl backdrop-blur-md opacity-0 transition-opacity duration-150 whitespace-nowrap"></div>
+
             <canvas id="blaster-canvas" class="absolute inset-0 z-20 pointer-events-none"></canvas>
 
             <!-- Heatmap -->
             <div class="relative z-10 w-full flex flex-col items-center">
-                <div id="heatmap-grid" class="flex gap-1.5 p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 shadow-inner"></div>
+                <div id="heatmap-grid" class="flex gap-1.5 p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 shadow-inner overflow-x-auto max-w-full"></div>
             </div>
 
             <!-- Launcher -->
