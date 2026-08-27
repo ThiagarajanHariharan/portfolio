@@ -565,21 +565,31 @@ class ContributionBlaster {
         this.playLaserSound();
     }
 
+    // 🚀 TACTICAL NUKE: Target and carpet-bomb ALL green boxes on the heatmap!
     launchTacticalNuke() {
         if (this.nukeInProgress) return;
         this.nukeInProgress = true;
         this.nukeBtn.disabled = true;
         this.nukeBtn.classList.add('opacity-50', 'animate-pulse');
 
-        const sorted = [...this.cells].sort((a, b) => {
-            return parseInt(b.dataset.count || '0') - parseInt(a.dataset.count || '0');
+        // Select ALL active green boxes (or all cells with original contributions)
+        let greenTargets = this.cells.filter(c => {
+            const count = parseInt(c.dataset.count || '0');
+            const level = parseInt(c.dataset.level || '0');
+            const orig = parseInt(c.dataset.originalLevel || '0');
+            return count > 0 || level > 0 || orig > 0;
         });
-        const peakTargets = sorted.slice(0, 16);
+
+        // Fallback if none found
+        if (greenTargets.length === 0) {
+            greenTargets = this.cells.filter((_, idx) => idx % 3 === 0);
+        }
 
         const containerRect = this.container.getBoundingClientRect();
         this.targetLocks = [];
 
-        peakTargets.forEach((cell, idx) => {
+        // Rapid lock-on wave across all green boxes
+        greenTargets.forEach((cell, idx) => {
             setTimeout(() => {
                 const cellRect = cell.getBoundingClientRect();
                 const tx = cellRect.left + cellRect.width / 2 - containerRect.left;
@@ -592,20 +602,23 @@ class ContributionBlaster {
                     date: cell.dataset.date,
                     count: cell.dataset.count
                 });
-                this.playRadarBeep();
-            }, idx * 50);
+                if (idx % 4 === 0) this.playRadarBeep();
+            }, idx * 18);
         });
 
-        const launchDelay = peakTargets.length * 50 + 300;
+        // Launch ballistic cruise missile swarm
+        const lockDuration = greenTargets.length * 18;
+        const launchDelay = lockDuration + 200;
+
         setTimeout(() => {
             this.playRocketLaunchSound();
             
-            peakTargets.forEach((cell, idx) => {
+            greenTargets.forEach((cell, idx) => {
                 setTimeout(() => {
                     const cellRect = cell.getBoundingClientRect();
                     const tx = cellRect.left + cellRect.width / 2 - containerRect.left;
                     const ty = cellRect.top + cellRect.height / 2 - containerRect.top;
-                    const startX = this.gunOrigin.x + (Math.random() * 140 - 70);
+                    const startX = this.gunOrigin.x + (Math.random() * 160 - 80);
                     const startY = this.gunOrigin.y;
 
                     this.missiles.push({
@@ -619,19 +632,26 @@ class ContributionBlaster {
                         date: cell.dataset.date,
                         count: cell.dataset.count,
                         progress: 0,
-                        speed: 0.032 + Math.random() * 0.015,
-                        arcHeight: Math.random() * 150 + 80,
+                        speed: 0.035 + Math.random() * 0.02,
+                        arcHeight: Math.random() * 160 + 90,
                         trail: []
                     });
-                }, idx * 60);
+
+                    if (idx % 6 === 0) this.playRocketLaunchSound();
+                }, idx * 24);
             });
         }, launchDelay);
+
+        const totalNukeTime = launchDelay + greenTargets.length * 24 + 1400;
 
         setTimeout(() => {
             this.nukeInProgress = false;
             this.nukeBtn.disabled = false;
             this.nukeBtn.classList.remove('opacity-50', 'animate-pulse');
-        }, launchDelay + peakTargets.length * 60 + 1500);
+            if (this.totalCommitsEl) {
+                this.totalCommitsEl.textContent = `💥 ALL ${greenTargets.length} TARGETS NUKED!`;
+            }
+        }, totalNukeTime);
     }
 
     spawnImpact(x, y, isCellHit = false, cell = null, exactLevel = null) {
