@@ -940,7 +940,7 @@
                 // Update Speedometer HUD
                 const kmh = Math.round(Math.abs(this.car.speed) * 160);
                 this.speedometerVal.textContent = kmh;
-                this.speedometerBar.style.width = ;
+                this.speedometerBar.style.width = Math.min(kmh / 1.4, 100) + '%';
                 this.gearIndicator.textContent = kmh > 90 ? 'GEAR 4' : (kmh > 50 ? 'GEAR 3' : (kmh > 20 ? 'GEAR 2' : 'GEAR 1'));
 
                 this.updateEngineAudio();
@@ -963,7 +963,7 @@
                 if (nearest && !this.modalOpen) {
                     this.proximityPrompt.classList.remove('opacity-0', 'translate-y-4');
                     this.proximityPrompt.classList.add('opacity-100', 'translate-y-0');
-                    this.proximityText.textContent = nearest.stolen ?  : ;
+                    this.proximityText.textContent = nearest.stolen ? "VIEW " + nearest.title : "INSPECT " + nearest.title;
                 } else {
                     this.proximityPrompt.classList.add('opacity-0', 'translate-y-4');
                     this.proximityPrompt.classList.remove('opacity-100', 'translate-y-0');
