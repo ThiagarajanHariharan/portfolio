@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏛️ The Louvre Heist | Grand Interior Gallery — Thiagarajan Hariharan</title>
-    <meta name="description" content="Breach the Louvre Palace doors and race through the opulent Grand Interior Gallery in an interactive 3D getaway car portfolio.">
+    <title>🏛️ The Louvre Heist | Photorealistic 3D Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="A cinematic photorealistic 3D getaway car heist portfolio through Paris and inside the Grand Gallery of the Louvre.">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🏛️ The Louvre Heist | Grand Interior Gallery">
+    <meta property="og:title" content="🏛️ The Louvre Heist | Photorealistic 3D Portfolio">
     <meta property="og:description" content="Breach the Louvre doors and explore project exhibits inside the Grand Interior Gallery.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
@@ -57,11 +57,11 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
         }
         .gold-border {
             border: 2px solid #fbbf24;
-            box-shadow: 0 0 35px rgba(251, 191, 36, 0.35);
+            box-shadow: 0 0 35px rgba(251, 191, 36, 0.4);
         }
         .red-alert-pulse {
             animation: redAlert 1.2s infinite alternate;
@@ -69,11 +69,6 @@
         @keyframes redAlert {
             0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.6); }
             100% { box-shadow: 0 0 45px rgba(239, 68, 68, 0.95); border-color: rgba(239, 68, 68, 1); }
-        }
-        .scanline {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
         }
         #leaflet-map {
             width: 100%;
@@ -101,7 +96,6 @@
 
     <!-- 3D Game Canvas Viewport -->
     <div id="game-container" class="w-full h-full absolute inset-0"></div>
-    <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-20"></div>
 
     <!-- Top GPS Navigation & Status HUD -->
     <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
@@ -124,13 +118,8 @@
             </div>
         </div>
 
-        <!-- 3D Map Layer Switcher, Camera & Controls -->
+        <!-- Camera, Radar & Controls -->
         <div class="flex items-center gap-3 pointer-events-auto">
-            <!-- Map Layer Toggle Button -->
-            <button id="layer-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-blue-500/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95">
-                <span>🛰️</span> <span id="layer-label">3D SATELLITE</span>
-            </button>
-
             <!-- Camera Toggle Button -->
             <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95">
                 <span>🎥</span> <span id="cam-label">CAM: CHASE</span>
@@ -150,7 +139,7 @@
             <!-- LIVE REAL LEAFLET SATELLITE MAP OVERLAY -->
             <div id="map-widget-container" class="glass-panel rounded-2xl p-1.5 border border-cyan-500/50 shadow-2xl relative w-32 h-32 md:w-44 md:h-44 transition-all duration-300 overflow-hidden">
                 <div class="absolute top-2 left-2 bg-blue-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded-md font-mono z-[500] shadow flex items-center gap-1 pointer-events-none">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LOUVRE GPS
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PARIS GPS
                 </div>
                 <div id="leaflet-map"></div>
             </div>
@@ -195,8 +184,6 @@
             <span>🎮 <strong>WASD:</strong> Drive</span>
             <span>•</span>
             <span><strong class="text-amber-400">SPACE:</strong> Drift</span>
-            <span>•</span>
-            <span><strong class="text-blue-400">M:</strong> 3D Layer</span>
             <span>•</span>
             <span><strong class="text-cyan-400">C:</strong> Camera</span>
             <span>•</span>
@@ -386,8 +373,6 @@
                 this.stolenCountEl = document.getElementById("stolen-count");
                 this.camToggleBtn = document.getElementById("cam-toggle-btn");
                 this.camLabel = document.getElementById("cam-label");
-                this.layerToggleBtn = document.getElementById("layer-toggle-btn");
-                this.layerLabel = document.getElementById("layer-label");
                 this.gpsCoordsHud = document.getElementById("gps-coords-hud");
                 this.streetLocationHud = document.getElementById("street-location-hud");
                 this.sectorCompass = document.getElementById("sector-compass");
@@ -408,13 +393,11 @@
                 this.safehouseModal = document.getElementById("safehouse-modal");
                 this.restartBtn = document.getElementById("restart-heist-btn");
 
-                // Camera & Layer Modes
+                // Camera Mode
                 this.camMode = "chase";
-                this.mapLayerMode = "satellite";
 
                 // Game & Breach State
                 this.doorsShattered = false;
-                this.isInsideLouvre = false;
                 this.stolenExhibits = new Set();
                 this.activeExhibit = null;
                 this.modalOpen = false;
@@ -466,8 +449,8 @@
 
             init() {
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x040711);
-                this.scene.fog = new THREE.FogExp2(0x040711, 0.008);
+                this.scene.background = new THREE.Color(0x060914);
+                this.scene.fog = new THREE.FogExp2(0x060914, 0.007);
 
                 this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 350);
                 
@@ -477,12 +460,12 @@
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.25;
+                this.renderer.toneMappingExposure = 1.35;
                 this.container.appendChild(this.renderer.domElement);
 
                 this.initLeafletMap();
                 this.setupLighting();
-                this.buildExteriorCourtyard();
+                this.buildPhotorealisticCourtyard();
                 this.buildGrandLouvreEntranceDoors();
                 this.buildGrandInteriorGallery();
                 this.build3DGoogleMapPins();
@@ -491,6 +474,132 @@
 
                 window.addEventListener("resize", () => this.onResize());
                 this.animate();
+            }
+
+            // ----------------------------------------------------
+            // 🎨 PROCEDURAL HIGH-RESOLUTION PBR TEXTURE GENERATORS
+            // ----------------------------------------------------
+            generateCobblestoneTexture() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 1024;
+                canvas.height = 1024;
+                const ctx = canvas.getContext("2d");
+
+                ctx.fillStyle = "#1e2430";
+                ctx.fillRect(0, 0, 1024, 1024);
+
+                // Draw detailed cobblestone pavers
+                const rows = 32;
+                const cols = 32;
+                const rw = 1024 / cols;
+                const rh = 1024 / rows;
+
+                for (let r = 0; r < rows; r++) {
+                    const offset = (r % 2) * (rw / 2);
+                    for (let c = -1; c < cols + 1; c++) {
+                        const x = c * rw + offset;
+                        const y = r * rh;
+                        const tone = Math.floor(Math.random() * 30 + 35);
+                        ctx.fillStyle = "rgb(" + (tone + 5) + "," + (tone + 10) + "," + (tone + 20) + ")";
+                        ctx.fillRect(x + 2, y + 2, rw - 4, rh - 4);
+
+                        // Specular edge highlight
+                        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x + 2, y + 2, rw - 4, rh - 4);
+                    }
+                }
+
+                // Wet puddle reflections
+                ctx.fillStyle = "rgba(6, 12, 24, 0.65)";
+                ctx.beginPath();
+                ctx.ellipse(300, 400, 180, 90, Math.PI / 6, 0, Math.PI * 2);
+                ctx.ellipse(700, 600, 220, 110, -Math.PI / 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(8, 8);
+                return texture;
+            }
+
+            generatePalaceFacadeTexture() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext("2d");
+
+                // Warm Parisian Limestone
+                ctx.fillStyle = "#cfc4b2";
+                ctx.fillRect(0, 0, 512, 512);
+
+                // Ashlar Stone Blocks
+                ctx.strokeStyle = "#a89b88";
+                ctx.lineWidth = 2;
+                for (let y = 0; y < 512; y += 32) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(512, y);
+                    ctx.stroke();
+                }
+
+                // Arched French Windows with warm glowing interior
+                for (let x = 32; x < 512; x += 96) {
+                    for (let y = 48; y < 450; y += 140) {
+                        // Window frame
+                        ctx.fillStyle = "#475569";
+                        ctx.fillRect(x, y, 48, 80);
+                        // Glass with warm amber light
+                        ctx.fillStyle = "#fef08a";
+                        ctx.fillRect(x + 4, y + 4, 40, 72);
+                        // Mullions
+                        ctx.strokeStyle = "#334155";
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(x + 24, y + 4);
+                        ctx.lineTo(x + 24, y + 76);
+                        ctx.moveTo(x + 4, y + 40);
+                        ctx.lineTo(x + 44, y + 40);
+                        ctx.stroke();
+                        // Arched Pediment
+                        ctx.fillStyle = "#b8ab97";
+                        ctx.beginPath();
+                        ctx.arc(x + 24, y + 2, 24, Math.PI, 0);
+                        ctx.fill();
+                    }
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(4, 2);
+                return texture;
+            }
+
+            generateHerringboneParquetTexture() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext("2d");
+
+                ctx.fillStyle = "#2d1a0c";
+                ctx.fillRect(0, 0, 512, 512);
+
+                // Draw rich French oak herringbone planks
+                for (let i = 0; i < 512; i += 32) {
+                    for (let j = 0; j < 512; j += 32) {
+                        const tone = Math.floor(Math.random() * 25 + 60);
+                        ctx.fillStyle = "rgb(" + (tone + 30) + "," + (tone + 10) + "," + (tone - 10) + ")";
+                        ctx.fillRect(i, j, 30, 30);
+                    }
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(8, 16);
+                return texture;
             }
 
             initLeafletMap() {
@@ -533,11 +642,11 @@
             }
 
             setupLighting() {
-                this.ambientLight = new THREE.AmbientLight(0x1e293b, 1.4);
+                this.ambientLight = new THREE.AmbientLight(0x38455f, 1.6);
                 this.scene.add(this.ambientLight);
 
-                const moonlight = new THREE.DirectionalLight(0x93c5fd, 1.2);
-                moonlight.position.set(50, 90, 50);
+                const moonlight = new THREE.DirectionalLight(0xbdd7ee, 1.4);
+                moonlight.position.set(60, 90, 60);
                 moonlight.castShadow = true;
                 moonlight.shadow.mapSize.width = 2048;
                 moonlight.shadow.mapSize.height = 2048;
@@ -545,7 +654,7 @@
 
                 this.alarmLights = [];
                 for (let z = -15; z >= -125; z -= 25) {
-                    const redLight = new THREE.PointLight(0xef4444, 0, 40);
+                    const redLight = new THREE.PointLight(0xef4444, 0, 45);
                     redLight.position.set(0, 14, z);
                     this.scene.add(redLight);
                     this.alarmLights.push(redLight);
@@ -553,60 +662,143 @@
             }
 
             // ----------------------------------------------------
-            // 🏛️ STAGE 1: EXTERIOR COURTYARD (COUR NAPOLÉON & PYRAMID)
+            // 🏛️ PHOTOREALISTIC EXTERIOR COURTYARD (COUR NAPOLÉON)
             // ----------------------------------------------------
-            buildExteriorCourtyard() {
-                const textureLoader = new THREE.TextureLoader();
-                this.satelliteTexture = textureLoader.load("louvre_satellite_real.jpg");
+            buildPhotorealisticCourtyard() {
+                const cobblestoneTex = this.generateCobblestoneTexture();
+                const facadeTex = this.generatePalaceFacadeTexture();
 
-                // Exterior Ground (z: 0 to 85)
+                // Courtyard Paved Ground (z: 0 to 90)
                 const extGeo = new THREE.PlaneGeometry(160, 90);
-                this.extMat = new THREE.MeshStandardMaterial({
-                    map: this.satelliteTexture,
-                    roughness: 0.3,
-                    metalness: 0.35
+                const extMat = new THREE.MeshStandardMaterial({
+                    map: cobblestoneTex,
+                    roughness: 0.25,
+                    metalness: 0.3
                 });
-                const extGround = new THREE.Mesh(extGeo, this.extMat);
+                const extGround = new THREE.Mesh(extGeo, extMat);
                 extGround.rotation.x = -Math.PI / 2;
                 extGround.position.set(0, 0, 45);
                 extGround.receiveShadow = true;
                 this.scene.add(extGround);
 
-                // Exterior Glass Pyramid
-                this.pyramidGroup = new THREE.Group();
-                this.pyramidGroup.position.set(0, 0, 35);
+                // Classical French Renaissance Palace Facades
+                const palaceMat = new THREE.MeshStandardMaterial({
+                    map: facadeTex,
+                    roughness: 0.6,
+                    metalness: 0.2
+                });
+                const slateRoofMat = new THREE.MeshStandardMaterial({ color: 0x273142, roughness: 0.4, metalness: 0.5 });
+                const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.85, roughness: 0.25 });
 
-                const pyrGeo = new THREE.ConeGeometry(14, 11, 4);
+                // Left Wing Palace (Aile Richelieu Exterior)
+                const leftWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
+                leftWing.position.set(-55, 13, 40);
+                leftWing.castShadow = true;
+                const leftRoof = new THREE.Mesh(new THREE.ConeGeometry(36, 12, 4), slateRoofMat);
+                leftRoof.position.set(-55, 32, 40);
+                leftRoof.rotation.y = Math.PI / 4;
+                this.scene.add(leftWing, leftRoof);
+
+                // Right Wing Palace (Aile Denon Exterior)
+                const rightWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
+                rightWing.position.set(55, 13, 40);
+                rightWing.castShadow = true;
+                const rightRoof = new THREE.Mesh(new THREE.ConeGeometry(36, 12, 4), slateRoofMat);
+                rightRoof.position.set(55, 32, 40);
+                rightRoof.rotation.y = Math.PI / 4;
+                this.scene.add(rightWing, rightRoof);
+
+                // Main Central Palace Facade with Grand Portal
+                const centerLeftFacade = new THREE.Mesh(new THREE.BoxGeometry(25, 26, 6), palaceMat);
+                centerLeftFacade.position.set(-20, 13, 0);
+                const centerRightFacade = new THREE.Mesh(new THREE.BoxGeometry(25, 26, 6), palaceMat);
+                centerRightFacade.position.set(20, 13, 0);
+                this.scene.add(centerLeftFacade, centerRightFacade);
+
+                // Ornate Louvre Glass Pyramid (51.5° Pei Standard)
+                this.pyramidGroup = new THREE.Group();
+                this.pyramidGroup.position.set(0, 0, 36);
+
+                const pyrGeo = new THREE.ConeGeometry(16, 12.5, 4);
                 pyrGeo.rotateY(Math.PI / 4);
                 const pyrMat = new THREE.MeshPhysicalMaterial({
-                    color: 0x38bdf8,
-                    transmission: 0.9,
-                    opacity: 0.9,
+                    color: 0x67e8f9,
+                    transmission: 0.95,
+                    opacity: 0.95,
                     transparent: true,
-                    roughness: 0.05,
-                    metalness: 0.15,
-                    reflectivity: 0.95
+                    roughness: 0.04,
+                    metalness: 0.1,
+                    reflectivity: 0.95,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.05
                 });
                 const pyrMesh = new THREE.Mesh(pyrGeo, pyrMat);
-                pyrMesh.position.y = 5.5;
+                pyrMesh.position.y = 6.25;
                 this.pyramidGroup.add(pyrMesh);
 
-                const wireGeo = new THREE.ConeGeometry(14.05, 11.05, 4, 6);
+                // Geometric Diamond Steel Trusses
+                const wireGeo = new THREE.ConeGeometry(16.06, 12.56, 4, 8);
                 wireGeo.rotateY(Math.PI / 4);
                 const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
                 const pyrWire = new THREE.Mesh(wireGeo, wireMat);
-                pyrWire.position.y = 5.5;
+                pyrWire.position.y = 6.25;
                 this.pyramidGroup.add(pyrWire);
+
+                // Warm Interior Core Uplight
+                const pyrCore = new THREE.PointLight(0xfef08a, 2.8, 25);
+                pyrCore.position.set(0, 4, 0);
+                this.pyramidGroup.add(pyrCore);
 
                 this.scene.add(this.pyramidGroup);
 
-                // Palace Facade Exterior Front
-                const palaceMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
-                const leftFacade = new THREE.Mesh(new THREE.BoxGeometry(65, 24, 6), palaceMat);
-                leftFacade.position.set(-45, 12, 0);
-                const rightFacade = new THREE.Mesh(new THREE.BoxGeometry(65, 24, 6), palaceMat);
-                rightFacade.position.set(45, 12, 0);
-                this.scene.add(leftFacade, rightFacade);
+                // 3 Granite Reflecting Water Pools
+                const waterMat = new THREE.MeshStandardMaterial({
+                    color: 0x0284c7,
+                    roughness: 0.05,
+                    metalness: 0.95,
+                    transparent: true,
+                    opacity: 0.88
+                });
+                const graniteMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 });
+
+                const poolConfigs = [
+                    { x: -16, z: 36, w: 10, d: 18 },
+                    { x: 16, z: 36, w: 10, d: 18 },
+                    { x: 0, z: 20, w: 18, d: 10 }
+                ];
+
+                poolConfigs.forEach(cfg => {
+                    const poolBasin = new THREE.Mesh(new THREE.BoxGeometry(cfg.w, 0.4, cfg.d), graniteMat);
+                    poolBasin.position.set(cfg.x, 0.2, cfg.z);
+                    this.scene.add(poolBasin);
+
+                    const waterSurface = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w - 0.8, cfg.d - 0.8), waterMat);
+                    waterSurface.rotation.x = -Math.PI / 2;
+                    waterSurface.position.set(cfg.x, 0.36, cfg.z);
+                    this.scene.add(waterSurface);
+                    this.fountainWaterMeshes.push(waterSurface);
+
+                    const waterLight = new THREE.PointLight(0x38bdf8, 1.2, 14);
+                    waterLight.position.set(cfg.x, 1.2, cfg.z);
+                    this.scene.add(waterLight);
+                });
+
+                // Classical Streetlamps
+                for (let z of [25, 60]) {
+                    for (let x of [-32, 32]) {
+                        const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 10), slateRoofMat);
+                        lampPole.position.set(x, 5, z);
+                        this.scene.add(lampPole);
+
+                        const lampCap = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.4), goldTrimMat);
+                        lampCap.position.set(x, 10, z);
+                        this.scene.add(lampCap);
+
+                        const lampLight = new THREE.PointLight(0xfef08a, 2.0, 32);
+                        lampLight.position.set(x, 10, z);
+                        this.scene.add(lampLight);
+                    }
+                }
             }
 
             // ----------------------------------------------------
@@ -625,37 +817,47 @@
                     roughness: 0.1,
                     metalness: 0.1
                 });
+                const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 });
 
                 // Grand Archway Frame
-                const arch = new THREE.Mesh(new THREE.BoxGeometry(26, 16, 2), doorFrameMat);
+                const arch = new THREE.Mesh(new THREE.BoxGeometry(22, 16, 2.5), doorFrameMat);
                 arch.position.set(0, 8, 0);
                 this.doorsGroup.add(arch);
 
-                // Glass & Gold French Doors
-                const doorL = new THREE.Mesh(new THREE.BoxGeometry(11, 14, 0.8), glassDoorMat);
-                doorL.position.set(-6, 7, 0);
-                const doorR = new THREE.Mesh(new THREE.BoxGeometry(11, 14, 0.8), glassDoorMat);
-                doorR.position.set(6, 7, 0);
+                // Left & Right Doors
+                const doorL = new THREE.Mesh(new THREE.BoxGeometry(8.5, 13, 0.8), darkOakMat);
+                doorL.position.set(-4.5, 6.8, 0);
+                const doorR = new THREE.Mesh(new THREE.BoxGeometry(8.5, 13, 0.8), darkOakMat);
+                doorR.position.set(4.5, 6.8, 0);
                 this.doorsGroup.add(doorL, doorR);
 
-                // Glowing Beacon Lights on Doors
-                const doorBeacon = new THREE.PointLight(0xfbbf24, 2.5, 25);
-                doorBeacon.position.set(0, 6, 2);
+                // Glass insets
+                const glassL = new THREE.Mesh(new THREE.BoxGeometry(6, 9, 0.9), glassDoorMat);
+                glassL.position.set(-4.5, 7.5, 0);
+                const glassR = new THREE.Mesh(new THREE.BoxGeometry(6, 9, 0.9), glassDoorMat);
+                glassR.position.set(4.5, 7.5, 0);
+                this.doorsGroup.add(glassL, glassR);
+
+                // Door Portal Beacon Light
+                const doorBeacon = new THREE.PointLight(0xfbbf24, 3.0, 30);
+                doorBeacon.position.set(0, 7, 3);
                 this.doorsGroup.add(doorBeacon);
 
                 this.scene.add(this.doorsGroup);
             }
 
             // ----------------------------------------------------
-            // 🏰 STAGE 2: OPULENT GRAND INTERIOR GALLERY (Z < 0 TO -140)
+            // 🏰 OPULENT GRAND INTERIOR GALLERY (Z < 0 TO -140)
             // ----------------------------------------------------
             buildGrandInteriorGallery() {
-                // Interior Polished Mirror Marble / Parquet Floor
+                const parquetTex = this.generateHerringboneParquetTexture();
+
+                // Interior Polished Mirror Parquet & Marble Floor
                 const intGeo = new THREE.PlaneGeometry(80, 150);
                 const intMat = new THREE.MeshStandardMaterial({
-                    color: 0x0a0f1d,
+                    map: parquetTex,
                     roughness: 0.12,
-                    metalness: 0.85
+                    metalness: 0.75
                 });
                 const intGround = new THREE.Mesh(intGeo, intMat);
                 intGround.rotation.x = -Math.PI / 2;
@@ -664,23 +866,23 @@
                 this.scene.add(intGround);
 
                 // High Vaulted Coffered Ceiling (y: 18)
-                const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+                const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
+                const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
+
                 const ceiling = new THREE.Mesh(new THREE.BoxGeometry(80, 2, 150), ceilingMat);
                 ceiling.position.set(0, 18, -75);
                 this.scene.add(ceiling);
 
-                // Interior Gallery Walls with Classical Gold Moldings
+                // Gallery Walls with Gold Moldings
                 const wallMat = new THREE.MeshStandardMaterial({ color: 0x182234, roughness: 0.5 });
-                const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
-
                 const leftIntWall = new THREE.Mesh(new THREE.BoxGeometry(4, 18, 150), wallMat);
                 leftIntWall.position.set(-40, 9, -75);
                 const rightIntWall = new THREE.Mesh(new THREE.BoxGeometry(4, 18, 150), wallMat);
                 rightIntWall.position.set(40, 9, -75);
                 this.scene.add(leftIntWall, rightIntWall);
 
-                // Grand Classical Marble Columns & Archways
-                const marbleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2, metalness: 0.3 });
+                // Classical Carrara Marble Columns & Archways
+                const marbleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.3 });
                 for (let z = -15; z >= -125; z -= 20) {
                     [-22, 22].forEach(x => {
                         const col = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 18, 20), marbleMat);
@@ -693,7 +895,6 @@
                         this.scene.add(cap);
                     });
 
-                    // Cross Arch Vault
                     const crossArch = new THREE.Mesh(new THREE.BoxGeometry(48, 1.5, 2), goldTrimMat);
                     crossArch.position.set(0, 16.5, z);
                     this.scene.add(crossArch);
@@ -757,6 +958,7 @@
                     ex.pinMesh = pinGroup;
                     this.pinMeshes.push(pinGroup);
 
+                    // Ornate Baroque Gilded Frame
                     const frameGroup = new THREE.Group();
                     frameGroup.position.set(ex.pos.x, ex.pos.y, ex.pos.z);
                     frameGroup.rotation.y = ex.pos.x < 0 ? Math.PI / 2 : -Math.PI / 2;
@@ -772,11 +974,18 @@
                     painting.position.z = 0.22;
                     frameGroup.add(painting);
 
+                    // Museum Picture Spot Light
+                    const spot = new THREE.SpotLight(0xffedd5, 3.2, 28, Math.PI / 4, 0.4);
+                    spot.position.set(ex.pos.x < 0 ? ex.pos.x + 8 : ex.pos.x - 8, 12, ex.pos.z);
+                    spot.target = frame;
+                    this.scene.add(spot);
+
                     this.scene.add(frameGroup);
                     ex.mesh = frameGroup;
                     ex.paintingMesh = painting;
                 });
 
+                // Safehouse Gate Extraction Zone
                 const safehouseGeo = new THREE.BoxGeometry(36, 0.2, 20);
                 const safehouseMat = new THREE.MeshBasicMaterial({ color: 0x22c55e, wireframe: true });
                 this.safehouseZone = new THREE.Mesh(safehouseGeo, safehouseMat);
@@ -940,7 +1149,6 @@
             triggerEntranceDoorsBreach() {
                 if (this.doorsShattered) return;
                 this.doorsShattered = true;
-                this.isInsideLouvre = true;
 
                 this.playGlassCrashSound();
                 this.playAlarmSiren();
@@ -957,8 +1165,8 @@
                 });
                 const goldShardMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9 });
 
-                for (let i = 0; i < 55; i++) {
-                    const isGold = Math.random() > 0.5;
+                for (let i = 0; i < 60; i++) {
+                    const isGold = Math.random() > 0.4;
                     const shardGeo = new THREE.TetrahedronGeometry(Math.random() * 1.6 + 0.4);
                     const shard = new THREE.Mesh(shardGeo, isGold ? goldShardMat : shardMat);
                     shard.position.set((Math.random() - 0.5) * 16, Math.random() * 10 + 2, (Math.random() - 0.5) * 6);
@@ -1079,12 +1287,6 @@
             }
 
             bindEvents() {
-                this.layerToggleBtn.addEventListener("click", () => {
-                    this.mapLayerMode = this.mapLayerMode === "satellite" ? "vector" : "satellite";
-                    this.extMat.color.setHex(this.mapLayerMode === "satellite" ? 0xffffff : 0x090d16);
-                    this.layerLabel.textContent = this.mapLayerMode === "satellite" ? "3D SATELLITE" : "3D VECTOR";
-                });
-
                 this.camToggleBtn.addEventListener("click", () => {
                     this.camMode = this.camMode === "chase" ? "topdown" : "chase";
                     this.camLabel.textContent = this.camMode === "chase" ? "CAM: CHASE" : "CAM: RADAR";
@@ -1099,12 +1301,6 @@
                     if (key === "d" || key === "arrowright") this.keys.right = isDown;
                     if (key === " ") this.keys.drift = isDown;
                     
-                    if (isDown && key === "m") {
-                        this.mapLayerMode = this.mapLayerMode === "satellite" ? "vector" : "satellite";
-                        this.extMat.color.setHex(this.mapLayerMode === "satellite" ? 0xffffff : 0x090d16);
-                        this.layerLabel.textContent = this.mapLayerMode === "satellite" ? "3D SATELLITE" : "3D VECTOR";
-                    }
-
                     if (isDown && key === "c") {
                         this.camMode = this.camMode === "chase" ? "topdown" : "chase";
                         this.camLabel.textContent = this.camMode === "chase" ? "CAM: CHASE" : "CAM: RADAR";
@@ -1380,6 +1576,12 @@
                 this.pinMeshes.forEach((pin) => {
                     pin.position.y = 8.5 + pinBob;
                     pin.rotation.y += 0.02;
+                });
+
+                // Shimmer fountain water
+                const time = Date.now() * 0.003;
+                this.fountainWaterMeshes.forEach((w, idx) => {
+                    w.position.y = 0.36 + Math.sin(time + idx) * 0.02;
                 });
 
                 // Chandelier gentle sway
