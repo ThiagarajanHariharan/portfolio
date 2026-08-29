@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏛️ The Louvre Heist | Photorealistic 3D Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="A cinematic photorealistic 3D getaway car heist portfolio through Paris and inside the Grand Gallery of the Louvre.">
+    <title>🏛️ The Louvre Heist | 60 FPS 3D Interactive Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="A silky smooth 60 FPS 3D getaway car heist portfolio through Paris and inside the Grand Gallery of the Louvre.">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🏛️ The Louvre Heist | Photorealistic 3D Portfolio">
-    <meta property="og:description" content="Breach the Louvre doors and explore project exhibits inside the Grand Interior Gallery.">
+    <meta property="og:title" content="🏛️ The Louvre Heist | 60 FPS 3D Portfolio">
+    <meta property="og:description" content="Breach the Louvre doors and explore project exhibits inside the Grand Interior Gallery at 60 FPS.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
     <meta name="theme-color" content="#020617">
@@ -54,14 +54,14 @@
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
             background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
         .gold-border {
             border: 2px solid #fbbf24;
-            box-shadow: 0 0 35px rgba(251, 191, 36, 0.4);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.35);
         }
         .red-alert-pulse {
             animation: redAlert 1.2s infinite alternate;
@@ -139,7 +139,7 @@
             <!-- LIVE REAL LEAFLET SATELLITE MAP OVERLAY -->
             <div id="map-widget-container" class="glass-panel rounded-2xl p-1.5 border border-cyan-500/50 shadow-2xl relative w-32 h-32 md:w-44 md:h-44 transition-all duration-300 overflow-hidden">
                 <div class="absolute top-2 left-2 bg-blue-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded-md font-mono z-[500] shadow flex items-center gap-1 pointer-events-none">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PARIS GPS
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 60 FPS GPS
                 </div>
                 <div id="leaflet-map"></div>
             </div>
@@ -403,6 +403,10 @@
                 this.modalOpen = false;
                 this.heistComplete = false;
 
+                // Delta Time Clock
+                this.clock = new THREE.Clock();
+                this.lastMapUpdateTime = 0;
+
                 // Car Physics State
                 this.car = {
                     pos: new THREE.Vector3(0, 0.5, 60),
@@ -458,7 +462,7 @@
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
-                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.shadowMap.type = THREE.PCFShadowMap;
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
                 this.renderer.toneMappingExposure = 1.35;
                 this.container.appendChild(this.renderer.domElement);
@@ -476,45 +480,38 @@
                 this.animate();
             }
 
-            // ----------------------------------------------------
-            // 🎨 PROCEDURAL HIGH-RESOLUTION PBR TEXTURE GENERATORS
-            // ----------------------------------------------------
             generateCobblestoneTexture() {
                 const canvas = document.createElement("canvas");
-                canvas.width = 1024;
-                canvas.height = 1024;
+                canvas.width = 512;
+                canvas.height = 512;
                 const ctx = canvas.getContext("2d");
 
                 ctx.fillStyle = "#1e2430";
-                ctx.fillRect(0, 0, 1024, 1024);
+                ctx.fillRect(0, 0, 512, 512);
 
-                // Draw detailed cobblestone pavers
-                const rows = 32;
-                const cols = 32;
-                const rw = 1024 / cols;
-                const rh = 1024 / rows;
+                const rows = 16;
+                const cols = 16;
+                const rw = 512 / cols;
+                const rh = 512 / rows;
 
                 for (let r = 0; r < rows; r++) {
                     const offset = (r % 2) * (rw / 2);
                     for (let c = -1; c < cols + 1; c++) {
                         const x = c * rw + offset;
                         const y = r * rh;
-                        const tone = Math.floor(Math.random() * 30 + 35);
+                        const tone = Math.floor(Math.random() * 25 + 35);
                         ctx.fillStyle = "rgb(" + (tone + 5) + "," + (tone + 10) + "," + (tone + 20) + ")";
                         ctx.fillRect(x + 2, y + 2, rw - 4, rh - 4);
-
-                        // Specular edge highlight
                         ctx.strokeStyle = "rgba(255,255,255,0.08)";
                         ctx.lineWidth = 1;
                         ctx.strokeRect(x + 2, y + 2, rw - 4, rh - 4);
                     }
                 }
 
-                // Wet puddle reflections
                 ctx.fillStyle = "rgba(6, 12, 24, 0.65)";
                 ctx.beginPath();
-                ctx.ellipse(300, 400, 180, 90, Math.PI / 6, 0, Math.PI * 2);
-                ctx.ellipse(700, 600, 220, 110, -Math.PI / 8, 0, Math.PI * 2);
+                ctx.ellipse(150, 200, 90, 45, Math.PI / 6, 0, Math.PI * 2);
+                ctx.ellipse(350, 300, 110, 55, -Math.PI / 8, 0, Math.PI * 2);
                 ctx.fill();
 
                 const texture = new THREE.CanvasTexture(canvas);
@@ -530,11 +527,9 @@
                 canvas.height = 512;
                 const ctx = canvas.getContext("2d");
 
-                // Warm Parisian Limestone
                 ctx.fillStyle = "#cfc4b2";
                 ctx.fillRect(0, 0, 512, 512);
 
-                // Ashlar Stone Blocks
                 ctx.strokeStyle = "#a89b88";
                 ctx.lineWidth = 2;
                 for (let y = 0; y < 512; y += 32) {
@@ -544,16 +539,12 @@
                     ctx.stroke();
                 }
 
-                // Arched French Windows with warm glowing interior
                 for (let x = 32; x < 512; x += 96) {
                     for (let y = 48; y < 450; y += 140) {
-                        // Window frame
                         ctx.fillStyle = "#475569";
                         ctx.fillRect(x, y, 48, 80);
-                        // Glass with warm amber light
                         ctx.fillStyle = "#fef08a";
                         ctx.fillRect(x + 4, y + 4, 40, 72);
-                        // Mullions
                         ctx.strokeStyle = "#334155";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
@@ -562,7 +553,6 @@
                         ctx.moveTo(x + 4, y + 40);
                         ctx.lineTo(x + 44, y + 40);
                         ctx.stroke();
-                        // Arched Pediment
                         ctx.fillStyle = "#b8ab97";
                         ctx.beginPath();
                         ctx.arc(x + 24, y + 2, 24, Math.PI, 0);
@@ -579,16 +569,15 @@
 
             generateHerringboneParquetTexture() {
                 const canvas = document.createElement("canvas");
-                canvas.width = 512;
-                canvas.height = 512;
+                canvas.width = 256;
+                canvas.height = 256;
                 const ctx = canvas.getContext("2d");
 
                 ctx.fillStyle = "#2d1a0c";
-                ctx.fillRect(0, 0, 512, 512);
+                ctx.fillRect(0, 0, 256, 256);
 
-                // Draw rich French oak herringbone planks
-                for (let i = 0; i < 512; i += 32) {
-                    for (let j = 0; j < 512; j += 32) {
+                for (let i = 0; i < 256; i += 32) {
+                    for (let j = 0; j < 256; j += 32) {
                         const tone = Math.floor(Math.random() * 25 + 60);
                         ctx.fillStyle = "rgb(" + (tone + 30) + "," + (tone + 10) + "," + (tone - 10) + ")";
                         ctx.fillRect(i, j, 30, 30);
@@ -648,12 +637,12 @@
                 const moonlight = new THREE.DirectionalLight(0xbdd7ee, 1.4);
                 moonlight.position.set(60, 90, 60);
                 moonlight.castShadow = true;
-                moonlight.shadow.mapSize.width = 2048;
-                moonlight.shadow.mapSize.height = 2048;
+                moonlight.shadow.mapSize.width = 1024;
+                moonlight.shadow.mapSize.height = 1024;
                 this.scene.add(moonlight);
 
                 this.alarmLights = [];
-                for (let z = -15; z >= -125; z -= 25) {
+                for (let z = -15; z >= -125; z -= 30) {
                     const redLight = new THREE.PointLight(0xef4444, 0, 45);
                     redLight.position.set(0, 14, z);
                     this.scene.add(redLight);
@@ -668,7 +657,6 @@
                 const cobblestoneTex = this.generateCobblestoneTexture();
                 const facadeTex = this.generatePalaceFacadeTexture();
 
-                // Courtyard Paved Ground (z: 0 to 90)
                 const extGeo = new THREE.PlaneGeometry(160, 90);
                 const extMat = new THREE.MeshStandardMaterial({
                     map: cobblestoneTex,
@@ -681,7 +669,6 @@
                 extGround.receiveShadow = true;
                 this.scene.add(extGround);
 
-                // Classical French Renaissance Palace Facades
                 const palaceMat = new THREE.MeshStandardMaterial({
                     map: facadeTex,
                     roughness: 0.6,
@@ -690,7 +677,6 @@
                 const slateRoofMat = new THREE.MeshStandardMaterial({ color: 0x273142, roughness: 0.4, metalness: 0.5 });
                 const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.85, roughness: 0.25 });
 
-                // Left Wing Palace (Aile Richelieu Exterior)
                 const leftWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
                 leftWing.position.set(-55, 13, 40);
                 leftWing.castShadow = true;
@@ -699,7 +685,6 @@
                 leftRoof.rotation.y = Math.PI / 4;
                 this.scene.add(leftWing, leftRoof);
 
-                // Right Wing Palace (Aile Denon Exterior)
                 const rightWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
                 rightWing.position.set(55, 13, 40);
                 rightWing.castShadow = true;
@@ -708,35 +693,29 @@
                 rightRoof.rotation.y = Math.PI / 4;
                 this.scene.add(rightWing, rightRoof);
 
-                // Main Central Palace Facade with Grand Portal
                 const centerLeftFacade = new THREE.Mesh(new THREE.BoxGeometry(25, 26, 6), palaceMat);
                 centerLeftFacade.position.set(-20, 13, 0);
                 const centerRightFacade = new THREE.Mesh(new THREE.BoxGeometry(25, 26, 6), palaceMat);
                 centerRightFacade.position.set(20, 13, 0);
                 this.scene.add(centerLeftFacade, centerRightFacade);
 
-                // Ornate Louvre Glass Pyramid (51.5° Pei Standard)
+                // High-Performance Glass Pyramid
                 this.pyramidGroup = new THREE.Group();
                 this.pyramidGroup.position.set(0, 0, 36);
 
                 const pyrGeo = new THREE.ConeGeometry(16, 12.5, 4);
                 pyrGeo.rotateY(Math.PI / 4);
-                const pyrMat = new THREE.MeshPhysicalMaterial({
+                const pyrMat = new THREE.MeshStandardMaterial({
                     color: 0x67e8f9,
-                    transmission: 0.95,
-                    opacity: 0.95,
                     transparent: true,
-                    roughness: 0.04,
-                    metalness: 0.1,
-                    reflectivity: 0.95,
-                    clearcoat: 1.0,
-                    clearcoatRoughness: 0.05
+                    opacity: 0.82,
+                    roughness: 0.05,
+                    metalness: 0.85
                 });
                 const pyrMesh = new THREE.Mesh(pyrGeo, pyrMat);
                 pyrMesh.position.y = 6.25;
                 this.pyramidGroup.add(pyrMesh);
 
-                // Geometric Diamond Steel Trusses
                 const wireGeo = new THREE.ConeGeometry(16.06, 12.56, 4, 8);
                 wireGeo.rotateY(Math.PI / 4);
                 const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
@@ -744,14 +723,9 @@
                 pyrWire.position.y = 6.25;
                 this.pyramidGroup.add(pyrWire);
 
-                // Warm Interior Core Uplight
-                const pyrCore = new THREE.PointLight(0xfef08a, 2.8, 25);
-                pyrCore.position.set(0, 4, 0);
-                this.pyramidGroup.add(pyrCore);
-
                 this.scene.add(this.pyramidGroup);
 
-                // 3 Granite Reflecting Water Pools
+                // 3 Reflecting Water Pools
                 const waterMat = new THREE.MeshStandardMaterial({
                     color: 0x0284c7,
                     roughness: 0.05,
@@ -777,28 +751,7 @@
                     waterSurface.position.set(cfg.x, 0.36, cfg.z);
                     this.scene.add(waterSurface);
                     this.fountainWaterMeshes.push(waterSurface);
-
-                    const waterLight = new THREE.PointLight(0x38bdf8, 1.2, 14);
-                    waterLight.position.set(cfg.x, 1.2, cfg.z);
-                    this.scene.add(waterLight);
                 });
-
-                // Classical Streetlamps
-                for (let z of [25, 60]) {
-                    for (let x of [-32, 32]) {
-                        const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 10), slateRoofMat);
-                        lampPole.position.set(x, 5, z);
-                        this.scene.add(lampPole);
-
-                        const lampCap = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.4), goldTrimMat);
-                        lampCap.position.set(x, 10, z);
-                        this.scene.add(lampCap);
-
-                        const lampLight = new THREE.PointLight(0xfef08a, 2.0, 32);
-                        lampLight.position.set(x, 10, z);
-                        this.scene.add(lampLight);
-                    }
-                }
             }
 
             // ----------------------------------------------------
@@ -809,39 +762,30 @@
                 this.doorsGroup.position.set(0, 0, 0);
 
                 const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
-                const glassDoorMat = new THREE.MeshPhysicalMaterial({
+                const glassDoorMat = new THREE.MeshStandardMaterial({
                     color: 0x38bdf8,
-                    transmission: 0.85,
-                    opacity: 0.9,
                     transparent: true,
+                    opacity: 0.85,
                     roughness: 0.1,
-                    metalness: 0.1
+                    metalness: 0.8
                 });
                 const darkOakMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 });
 
-                // Grand Archway Frame
                 const arch = new THREE.Mesh(new THREE.BoxGeometry(22, 16, 2.5), doorFrameMat);
                 arch.position.set(0, 8, 0);
                 this.doorsGroup.add(arch);
 
-                // Left & Right Doors
                 const doorL = new THREE.Mesh(new THREE.BoxGeometry(8.5, 13, 0.8), darkOakMat);
                 doorL.position.set(-4.5, 6.8, 0);
                 const doorR = new THREE.Mesh(new THREE.BoxGeometry(8.5, 13, 0.8), darkOakMat);
                 doorR.position.set(4.5, 6.8, 0);
                 this.doorsGroup.add(doorL, doorR);
 
-                // Glass insets
                 const glassL = new THREE.Mesh(new THREE.BoxGeometry(6, 9, 0.9), glassDoorMat);
                 glassL.position.set(-4.5, 7.5, 0);
                 const glassR = new THREE.Mesh(new THREE.BoxGeometry(6, 9, 0.9), glassDoorMat);
                 glassR.position.set(4.5, 7.5, 0);
                 this.doorsGroup.add(glassL, glassR);
-
-                // Door Portal Beacon Light
-                const doorBeacon = new THREE.PointLight(0xfbbf24, 3.0, 30);
-                doorBeacon.position.set(0, 7, 3);
-                this.doorsGroup.add(doorBeacon);
 
                 this.scene.add(this.doorsGroup);
             }
@@ -852,7 +796,6 @@
             buildGrandInteriorGallery() {
                 const parquetTex = this.generateHerringboneParquetTexture();
 
-                // Interior Polished Mirror Parquet & Marble Floor
                 const intGeo = new THREE.PlaneGeometry(80, 150);
                 const intMat = new THREE.MeshStandardMaterial({
                     map: parquetTex,
@@ -865,7 +808,6 @@
                 intGround.receiveShadow = true;
                 this.scene.add(intGround);
 
-                // High Vaulted Coffered Ceiling (y: 18)
                 const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
                 const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
 
@@ -873,7 +815,6 @@
                 ceiling.position.set(0, 18, -75);
                 this.scene.add(ceiling);
 
-                // Gallery Walls with Gold Moldings
                 const wallMat = new THREE.MeshStandardMaterial({ color: 0x182234, roughness: 0.5 });
                 const leftIntWall = new THREE.Mesh(new THREE.BoxGeometry(4, 18, 150), wallMat);
                 leftIntWall.position.set(-40, 9, -75);
@@ -881,11 +822,10 @@
                 rightIntWall.position.set(40, 9, -75);
                 this.scene.add(leftIntWall, rightIntWall);
 
-                // Classical Carrara Marble Columns & Archways
                 const marbleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.3 });
                 for (let z = -15; z >= -125; z -= 20) {
                     [-22, 22].forEach(x => {
-                        const col = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 18, 20), marbleMat);
+                        const col = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 18, 16), marbleMat);
                         col.position.set(x, 9, z);
                         col.castShadow = true;
                         this.scene.add(col);
@@ -900,18 +840,14 @@
                     this.scene.add(crossArch);
                 }
 
-                // Glowing Crystal Chandeliers
-                const crystalMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 0.9, metalness: 0.9 });
+                // Optimized Chandeliers
+                const crystalMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, metalness: 0.9 });
                 for (let z = -25; z >= -115; z -= 30) {
                     const chGroup = new THREE.Group();
                     chGroup.position.set(0, 14, z);
 
-                    const chBody = new THREE.Mesh(new THREE.OctahedronGeometry(2.2, 2), crystalMat);
+                    const chBody = new THREE.Mesh(new THREE.OctahedronGeometry(2.2, 1), crystalMat);
                     chGroup.add(chBody);
-
-                    const chLight = new THREE.PointLight(0xfef08a, 2.2, 35);
-                    chLight.position.set(0, -1, 0);
-                    chGroup.add(chLight);
 
                     this.scene.add(chGroup);
                     this.chandeliers.push(chGroup);
@@ -927,13 +863,13 @@
                     pinGroup.position.set(ex.pos.x, 8.5, ex.pos.z);
 
                     const pinHead = new THREE.Mesh(
-                        new THREE.SphereGeometry(1.4, 16, 16),
+                        new THREE.SphereGeometry(1.4, 12, 12),
                         new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.7, roughness: 0.2 })
                     );
                     pinGroup.add(pinHead);
 
                     const pinTip = new THREE.Mesh(
-                        new THREE.ConeGeometry(1.4, 2.2, 16),
+                        new THREE.ConeGeometry(1.4, 2.2, 12),
                         new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.7, roughness: 0.2 })
                     );
                     pinTip.position.y = -1.2;
@@ -941,14 +877,14 @@
                     pinGroup.add(pinTip);
 
                     const pinDot = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.5, 12, 12),
+                        new THREE.SphereGeometry(0.5, 8, 8),
                         new THREE.MeshBasicMaterial({ color: 0xffffff })
                     );
                     pinDot.position.z = 1.0;
                     pinGroup.add(pinDot);
 
                     const beacon = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.15, 0.4, 12, 8),
+                        new THREE.CylinderGeometry(0.15, 0.4, 12, 6),
                         new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.45 })
                     );
                     beacon.position.y = -6;
@@ -958,7 +894,6 @@
                     ex.pinMesh = pinGroup;
                     this.pinMeshes.push(pinGroup);
 
-                    // Ornate Baroque Gilded Frame
                     const frameGroup = new THREE.Group();
                     frameGroup.position.set(ex.pos.x, ex.pos.y, ex.pos.z);
                     frameGroup.rotation.y = ex.pos.x < 0 ? Math.PI / 2 : -Math.PI / 2;
@@ -974,18 +909,11 @@
                     painting.position.z = 0.22;
                     frameGroup.add(painting);
 
-                    // Museum Picture Spot Light
-                    const spot = new THREE.SpotLight(0xffedd5, 3.2, 28, Math.PI / 4, 0.4);
-                    spot.position.set(ex.pos.x < 0 ? ex.pos.x + 8 : ex.pos.x - 8, 12, ex.pos.z);
-                    spot.target = frame;
-                    this.scene.add(spot);
-
                     this.scene.add(frameGroup);
                     ex.mesh = frameGroup;
                     ex.paintingMesh = painting;
                 });
 
-                // Safehouse Gate Extraction Zone
                 const safehouseGeo = new THREE.BoxGeometry(36, 0.2, 20);
                 const safehouseMat = new THREE.MeshBasicMaterial({ color: 0x22c55e, wireframe: true });
                 this.safehouseZone = new THREE.Mesh(safehouseGeo, safehouseMat);
@@ -1044,17 +972,14 @@
             buildHighFidelitySportsCar() {
                 this.carGroup = new THREE.Group();
 
-                const carPaintMat = new THREE.MeshPhysicalMaterial({
+                const carPaintMat = new THREE.MeshStandardMaterial({
                     color: 0xef4444,
                     metalness: 0.85,
-                    roughness: 0.15,
-                    clearcoat: 1.0,
-                    clearcoatRoughness: 0.1,
-                    reflectivity: 0.9
+                    roughness: 0.15
                 });
 
                 const carbonMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.3, metalness: 0.8 });
-                const tintedGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x020617, roughness: 0.05, metalness: 0.95, transmission: 0.4 });
+                const tintedGlassMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.1, metalness: 0.9, transparent: true, opacity: 0.85 });
                 const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.1 });
                 const tireRubberMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.85 });
                 const brakeCaliperMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.7, roughness: 0.2 });
@@ -1110,7 +1035,7 @@
                     const holder = new THREE.Group();
                     holder.position.set(x, y, z);
 
-                    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.36, 18), tireRubberMat);
+                    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.36, 14), tireRubberMat);
                     tire.rotation.z = Math.PI / 2;
                     tire.castShadow = true;
                     holder.add(tire);
@@ -1155,17 +1080,16 @@
 
                 this.scene.remove(this.doorsGroup);
 
-                // Explosive Shards
-                const shardMat = new THREE.MeshPhysicalMaterial({
+                const shardMat = new THREE.MeshStandardMaterial({
                     color: 0x38bdf8,
-                    transmission: 0.9,
-                    opacity: 0.85,
                     transparent: true,
-                    roughness: 0.1
+                    opacity: 0.85,
+                    roughness: 0.1,
+                    metalness: 0.8
                 });
                 const goldShardMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9 });
 
-                for (let i = 0; i < 60; i++) {
+                for (let i = 0; i < 40; i++) {
                     const isGold = Math.random() > 0.4;
                     const shardGeo = new THREE.TetrahedronGeometry(Math.random() * 1.6 + 0.4);
                     const shard = new THREE.Mesh(shardGeo, isGold ? goldShardMat : shardMat);
@@ -1176,7 +1100,6 @@
                     this.shards.push(shard);
                 }
 
-                // Update HUD to Inside State
                 this.zoneBadge.textContent = "INSIDE GRAND GALLERY";
                 this.streetLocationHud.textContent = "🚨 INFILTRATION ACTIVE: STEAL ALL 4 MASTERPIECES!";
                 this.streetLocationHud.classList.add("text-amber-400");
@@ -1184,12 +1107,13 @@
             }
 
             spawnDriftSmoke(x, z) {
+                if (this.smokeParticles.length > 25) return;
                 const smokeMat = new THREE.MeshBasicMaterial({
                     color: 0xe2e8f0,
                     transparent: true,
                     opacity: 0.6
                 });
-                const smoke = new THREE.Mesh(new THREE.SphereGeometry(0.35 + Math.random() * 0.25, 6, 6), smokeMat);
+                const smoke = new THREE.Mesh(new THREE.SphereGeometry(0.35 + Math.random() * 0.25, 4, 4), smokeMat);
                 smoke.position.set(x + (Math.random() - 0.5) * 0.4, 0.3, z + (Math.random() - 0.5) * 0.4);
                 this.scene.add(smoke);
                 this.smokeParticles.push({ mesh: smoke, opacity: 0.6, scale: 1 });
@@ -1222,7 +1146,7 @@
             playGlassCrashSound() {
                 if (!this.audioCtx) return;
                 try {
-                    const bufferSize = this.audioCtx.sampleRate * 0.8;
+                    const bufferSize = this.audioCtx.sampleRate * 0.6;
                     const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
                     const output = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
@@ -1232,11 +1156,11 @@
                     const filter = this.audioCtx.createBiquadFilter();
                     filter.type = "bandpass";
                     filter.frequency.setValueAtTime(3200, this.audioCtx.currentTime);
-                    filter.frequency.exponentialRampToValueAtTime(600, this.audioCtx.currentTime + 0.6);
+                    filter.frequency.exponentialRampToValueAtTime(600, this.audioCtx.currentTime + 0.5);
 
                     const gain = this.audioCtx.createGain();
                     gain.gain.setValueAtTime(0.5, this.audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.7);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.6);
 
                     whiteNoise.connect(filter);
                     filter.connect(gain);
@@ -1422,7 +1346,10 @@
                 this.closeInspectionModal();
             }
 
-            updateGPSTelemetry() {
+            // ----------------------------------------------------
+            // ⏱️ 60 FPS THROTTLED GPS & LEAFLET MAP ENGINE
+            // ----------------------------------------------------
+            updateGPSTelemetry(now) {
                 const deltaLat = (-this.car.pos.z * 1.8) / GPS_BASE.metersPerDegLat;
                 const deltaLng = (this.car.pos.x * 1.8) / GPS_BASE.metersPerDegLng;
 
@@ -1431,10 +1358,14 @@
 
                 this.gpsCoordsHud.textContent = currentLat.toFixed(6) + "° N, " + currentLng.toFixed(6) + "° E";
 
-                if (this.leafletMap && this.playerMarker) {
-                    const latlng = [currentLat, currentLng];
-                    this.playerMarker.setLatLng(latlng);
-                    this.leafletMap.panTo(latlng, { animate: false });
+                // Throttle Leaflet DOM map updates to 5 Hz (every 200ms) to eliminate CPU lag!
+                if (now - this.lastMapUpdateTime > 200) {
+                    this.lastMapUpdateTime = now;
+                    if (this.leafletMap && this.playerMarker) {
+                        const latlng = [currentLat, currentLng];
+                        this.playerMarker.setLatLng(latlng);
+                        this.leafletMap.panTo(latlng, { animate: false });
+                    }
                 }
 
                 if (this.car.pos.z < 0) {
@@ -1449,43 +1380,46 @@
                 this.sectorCompass.textContent = "HDG " + degHeading + "°";
             }
 
-            updateCarPhysics() {
+            // ----------------------------------------------------
+            // 🏎️ DELTA-TIME VEHICLE PHYSICS
+            // ----------------------------------------------------
+            updateCarPhysics(delta) {
                 if (this.modalOpen) {
                     this.car.speed *= 0.8;
                     return;
                 }
 
+                const dtRatio = Math.min(delta * 60, 2.0);
+
                 if (this.keys.up) {
-                    this.car.speed = Math.min(this.car.speed + this.car.accel, this.car.maxSpeed);
+                    this.car.speed = Math.min(this.car.speed + this.car.accel * dtRatio, this.car.maxSpeed);
                 } else if (this.keys.down) {
-                    this.car.speed = Math.max(this.car.speed - this.car.accel * 0.8, -this.car.maxSpeed * 0.4);
+                    this.car.speed = Math.max(this.car.speed - this.car.accel * 0.8 * dtRatio, -this.car.maxSpeed * 0.4);
                 } else {
-                    this.car.speed *= this.car.friction;
+                    this.car.speed *= Math.pow(this.car.friction, dtRatio);
                 }
 
-                const steerMultiplier = this.keys.drift ? 0.055 : 0.038;
+                const steerMultiplier = (this.keys.drift ? 0.055 : 0.038) * dtRatio;
                 if (this.keys.left && Math.abs(this.car.speed) > 0.01) {
                     this.car.heading += (this.car.speed > 0 ? 1 : -1) * steerMultiplier;
-                    this.car.steerAngle = Math.min(this.car.steerAngle + 0.08, 0.45);
+                    this.car.steerAngle = Math.min(this.car.steerAngle + 0.08 * dtRatio, 0.45);
                     if (this.keys.drift) this.spawnDriftSmoke(this.car.pos.x, this.car.pos.z);
                 } else if (this.keys.right && Math.abs(this.car.speed) > 0.01) {
                     this.car.heading -= (this.car.speed > 0 ? 1 : -1) * steerMultiplier;
-                    this.car.steerAngle = Math.max(this.car.steerAngle - 0.08, -0.45);
+                    this.car.steerAngle = Math.max(this.car.steerAngle - 0.08 * dtRatio, -0.45);
                     if (this.keys.drift) this.spawnDriftSmoke(this.car.pos.x, this.car.pos.z);
                 } else {
-                    this.car.steerAngle *= 0.85;
+                    this.car.steerAngle *= Math.pow(0.85, dtRatio);
                 }
 
-                this.car.pos.x -= Math.sin(this.car.heading) * this.car.speed;
-                this.car.pos.z -= Math.cos(this.car.heading) * this.car.speed;
+                this.car.pos.x -= Math.sin(this.car.heading) * this.car.speed * dtRatio;
+                this.car.pos.z -= Math.cos(this.car.heading) * this.car.speed * dtRatio;
 
-                // Boundary bounds
                 if (this.car.pos.x < -36) { this.car.pos.x = -36; this.car.speed *= -0.3; }
                 if (this.car.pos.x > 36) { this.car.pos.x = 36; this.car.speed *= -0.3; }
                 if (this.car.pos.z > 70) { this.car.pos.z = 70; this.car.speed *= -0.3; }
                 if (this.car.pos.z < -135) { this.car.pos.z = -135; this.car.speed *= -0.3; }
 
-                // Door Breach Trigger at z = 0
                 if (!this.doorsShattered && Math.abs(this.car.pos.z) < 4 && Math.abs(this.car.pos.x) < 14) {
                     if (Math.abs(this.car.speed) > 0.2) {
                         this.triggerEntranceDoorsBreach();
@@ -1503,10 +1437,10 @@
 
                 this.car.frontWheels.forEach(fw => {
                     fw.holder.rotation.y = this.car.steerAngle;
-                    fw.wheel.rotation.x += this.car.speed * 1.5;
+                    fw.wheel.rotation.x += this.car.speed * 1.5 * dtRatio;
                 });
                 this.car.rearWheels.forEach(rw => {
-                    rw.wheel.rotation.x += this.car.speed * 1.5;
+                    rw.wheel.rotation.x += this.car.speed * 1.5 * dtRatio;
                 });
 
                 this.car.mesh.position.copy(this.car.pos);
@@ -1518,9 +1452,9 @@
                     const targetCamX = this.car.pos.x + Math.sin(this.car.heading) * camDist;
                     const targetCamZ = this.car.pos.z + Math.cos(this.car.heading) * camDist;
                     
-                    this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
-                    this.camera.position.y += (this.car.pos.y + camHeight - this.camera.position.y) * 0.1;
-                    this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
+                    this.camera.position.x += (targetCamX - this.camera.position.x) * (0.1 * dtRatio);
+                    this.camera.position.y += (this.car.pos.y + camHeight - this.camera.position.y) * (0.1 * dtRatio);
+                    this.camera.position.z += (targetCamZ - this.camera.position.z) * (0.1 * dtRatio);
                     this.camera.lookAt(this.car.pos.x, this.car.pos.y + 1.2, this.car.pos.z);
                 } else {
                     this.camera.position.set(this.car.pos.x, 48, this.car.pos.z + 14);
@@ -1533,7 +1467,6 @@
                 this.gearIndicator.textContent = kmh > 90 ? "GEAR 4" : (kmh > 50 ? "GEAR 3" : (kmh > 20 ? "GEAR 2" : "GEAR 1"));
 
                 this.updateEngineAudio();
-                this.updateGPSTelemetry();
             }
 
             checkProximityTriggers() {
@@ -1569,24 +1502,26 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
 
-                this.updateCarPhysics();
+                const delta = THREE.MathUtils.clamp(this.clock.getDelta(), 0.001, 0.1);
+                const now = performance.now();
+
+                this.updateCarPhysics(delta);
+                this.updateGPSTelemetry(now);
                 this.checkProximityTriggers();
 
-                const pinBob = Math.sin(Date.now() * 0.004) * 0.6;
+                const pinBob = Math.sin(now * 0.004) * 0.6;
                 this.pinMeshes.forEach((pin) => {
                     pin.position.y = 8.5 + pinBob;
                     pin.rotation.y += 0.02;
                 });
 
-                // Shimmer fountain water
-                const time = Date.now() * 0.003;
+                const time = now * 0.003;
                 this.fountainWaterMeshes.forEach((w, idx) => {
                     w.position.y = 0.36 + Math.sin(time + idx) * 0.02;
                 });
 
-                // Chandelier gentle sway
                 this.chandeliers.forEach((ch, idx) => {
-                    ch.rotation.z = Math.sin(Date.now() * 0.002 + idx) * 0.05;
+                    ch.rotation.z = Math.sin(now * 0.002 + idx) * 0.05;
                 });
 
                 for (let i = this.shards.length - 1; i >= 0; i--) {
@@ -1616,7 +1551,7 @@
                 }
 
                 if (this.doorsShattered) {
-                    const intensity = Math.sin(Date.now() * 0.008) * 1.5 + 1.5;
+                    const intensity = Math.sin(now * 0.008) * 1.5 + 1.5;
                     this.alarmLights.forEach(l => l.intensity = intensity);
                 }
 
