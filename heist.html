@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-    <title>🏛️ The Louvre Pyramid Heist | 3D Interactive Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="Smash through the giant Glass Pyramid of the Louvre and infiltrate the Grande Galerie in a high-speed 3D heist.">
+    <title>🏛️ The Musée du Louvre Heist | 3D Interactive Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="An authentic 3D interactive getaway car heist portfolio inside the real Cour Napoléon and Grande Galerie of the Musée du Louvre, Paris.">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🏛️ The Louvre Pyramid Heist | 3D Interactive Portfolio">
+    <meta property="og:title" content="🏛️ The Musée du Louvre Heist | 3D Interactive Portfolio">
     <meta property="og:description" content="Smash through the giant Glass Pyramid and steal engineering masterpieces inside the Louvre.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
@@ -51,7 +51,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #060914; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #7bb4eb; }
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
             background: rgba(11, 17, 33, 0.94);
@@ -91,7 +91,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-white font-sans select-none relative overflow-hidden">
+<body class="bg-slate-900 text-white font-sans select-none relative overflow-hidden">
 
     <!-- 3D Game Canvas Viewport -->
     <div id="game-container" class="w-full h-full absolute inset-0"></div>
@@ -358,7 +358,7 @@
             metersPerDegLng: 73000
         };
 
-        class PyramidBreachGame {
+        class GoldenLouvreGame {
             constructor() {
                 this.container = document.getElementById("game-container");
                 this.speedometerVal = document.getElementById("speedometer-val");
@@ -399,7 +399,6 @@
                 this.clock = new THREE.Clock();
                 this.lastMapUpdateTime = 0;
 
-                // Car spawns at z = 78 looking directly at the giant Glass Pyramid at z = 36
                 this.car = {
                     pos: new THREE.Vector3(0, 0.5, 78),
                     vel: new THREE.Vector3(0, 0, 0),
@@ -436,8 +435,9 @@
 
             init() {
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x060914);
-                this.scene.fog = new THREE.FogExp2(0x060914, 0.004);
+                // Radiant Parisian Daytime Blue Sky
+                this.scene.background = new THREE.Color(0x70b0ec);
+                this.scene.fog = new THREE.FogExp2(0xa5d2f8, 0.002);
 
                 this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 400);
                 
@@ -445,7 +445,7 @@
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.35;
+                this.renderer.toneMappingExposure = 1.05;
                 this.container.appendChild(this.renderer.domElement);
 
                 this.initLeafletMap();
@@ -461,17 +461,21 @@
                 this.animate();
             }
 
-            generateSaintMaximinLimestoneTexture() {
+            // ----------------------------------------------------
+            // 🎨 AUTHENTIC HONEY-GOLD LIMESTONE & SAND PAVING
+            // ----------------------------------------------------
+            generateHoneyLimestoneTexture() {
                 const canvas = document.createElement("canvas");
                 canvas.width = 1024;
                 canvas.height = 1024;
                 const ctx = canvas.getContext("2d");
 
-                ctx.fillStyle = "#dfd5c4";
+                // Rich Golden Honey Parisian Limestone with Relief Shadow
+                ctx.fillStyle = "#c89b52";
                 ctx.fillRect(0, 0, 1024, 1024);
 
-                ctx.strokeStyle = "#bdae99";
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#8f6727";
+                ctx.lineWidth = 3;
                 for (let y = 0; y < 1024; y += 48) {
                     ctx.beginPath();
                     ctx.moveTo(0, y);
@@ -479,9 +483,10 @@
                     ctx.stroke();
                 }
 
+                // Classical Multi-tiered French Arched Windows with Carved Pediments
                 for (let x = 48; x < 1024; x += 160) {
                     for (let y = 60; y < 900; y += 220) {
-                        ctx.fillStyle = "#cfbeaa";
+                        ctx.fillStyle = "#cca05a";
                         ctx.beginPath();
                         ctx.arc(x + 40, y, 40, Math.PI, 0);
                         ctx.fill();
@@ -489,7 +494,8 @@
                         ctx.fillStyle = "#1e293b";
                         ctx.fillRect(x, y, 80, 140);
 
-                        ctx.fillStyle = "#fef08a";
+                        // Blue sky window reflection
+                        ctx.fillStyle = "#93c5fd";
                         ctx.fillRect(x + 5, y + 5, 70, 130);
 
                         ctx.strokeStyle = "#0f172a";
@@ -500,7 +506,7 @@
                         ctx.moveTo(x + 5, y + 90); ctx.lineTo(x + 75, y + 90);
                         ctx.stroke();
 
-                        ctx.fillStyle = "#c7b7a1";
+                        ctx.fillStyle = "#c29650";
                         ctx.fillRect(x - 10, y + 140, 100, 20);
                     }
                 }
@@ -512,13 +518,47 @@
                 return texture;
             }
 
-            generateCourtyardPavingTexture() {
+            
+            generatePyramidDiamondTexture() {
                 const canvas = document.createElement("canvas");
                 canvas.width = 1024;
                 canvas.height = 1024;
                 const ctx = canvas.getContext("2d");
 
-                ctx.fillStyle = "#1e2532";
+                ctx.fillStyle = "rgba(186, 230, 253, 0.4)";
+                ctx.fillRect(0, 0, 1024, 1024);
+
+                ctx.strokeStyle = "#0284c7";
+                ctx.lineWidth = 4;
+
+                const step = 64;
+                for (let i = -1024; i < 2048; i += step) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i + 1024, 1024);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(i, 1024);
+                    ctx.lineTo(i + 1024, 0);
+                    ctx.stroke();
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(4, 4);
+                return texture;
+            }
+
+            generateSandPavingTexture() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 1024;
+                canvas.height = 1024;
+                const ctx = canvas.getContext("2d");
+
+                // Rich Sand & Granite Courtyard Paving (as seen in photo)
+                ctx.fillStyle = "#9c8e76";
                 ctx.fillRect(0, 0, 1024, 1024);
 
                 const rows = 16;
@@ -531,12 +571,12 @@
                     for (let c = -1; c < cols + 1; c++) {
                         const x = c * rw + offset;
                         const y = r * rh;
-                        const tone = Math.floor(Math.random() * 20 + 35);
-                        ctx.fillStyle = "rgb(" + (tone + 5) + "," + (tone + 10) + "," + (tone + 20) + ")";
-                        ctx.fillRect(x + 2, y + 2, rw - 4, rh - 4);
-                        ctx.strokeStyle = "rgba(255,255,255,0.06)";
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(x + 2, y + 2, rw - 4, rh - 4);
+                        const tone = Math.floor(Math.random() * 25 + 160);
+                        ctx.fillStyle = "rgb(" + (tone + 15) + "," + (tone + 5) + "," + (tone - 20) + ")";
+                        ctx.fillRect(x + 3, y + 3, rw - 6, rh - 6);
+                        ctx.strokeStyle = "rgba(70,60,45,0.4)";
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x + 3, y + 3, rw - 6, rh - 6);
                     }
                 }
 
@@ -609,12 +649,13 @@
             }
 
             setupLighting() {
-                this.ambientLight = new THREE.AmbientLight(0x475569, 1.4);
+                // Golden Afternoon Parisian Sunlight
+                this.ambientLight = new THREE.AmbientLight(0xdbeafe, 0.9);
                 this.scene.add(this.ambientLight);
 
-                const moonlight = new THREE.DirectionalLight(0xdbeafe, 1.4);
-                moonlight.position.set(50, 100, 60);
-                this.scene.add(moonlight);
+                const sun = new THREE.DirectionalLight(0xfef3c7, 1.4);
+                sun.position.set(70, 110, 70);
+                this.scene.add(sun);
 
                 this.alarmLights = [];
                 for (let z = 20; z >= -60; z -= 25) {
@@ -626,14 +667,14 @@
             }
 
             buildAuthenticCourtyard() {
-                const limestoneTex = this.generateSaintMaximinLimestoneTexture();
-                const pavingTex = this.generateCourtyardPavingTexture();
+                const honeyLimestoneTex = this.generateHoneyLimestoneTexture();
+                const sandPavingTex = this.generateSandPavingTexture();
 
                 const extGeo = new THREE.PlaneGeometry(160, 140);
                 const extMat = new THREE.MeshStandardMaterial({
-                    map: pavingTex,
-                    roughness: 0.3,
-                    metalness: 0.2
+                    map: sandPavingTex,
+                    roughness: 0.45,
+                    metalness: 0.1
                 });
                 const extGround = new THREE.Mesh(extGeo, extMat);
                 extGround.rotation.x = -Math.PI / 2;
@@ -641,11 +682,11 @@
                 this.scene.add(extGround);
 
                 const palaceMat = new THREE.MeshStandardMaterial({
-                    map: limestoneTex,
-                    roughness: 0.55,
-                    metalness: 0.2
+                    map: honeyLimestoneTex,
+                    roughness: 0.45,
+                    metalness: 0.15
                 });
-                const slateRoofMat = new THREE.MeshStandardMaterial({ color: 0x273142, roughness: 0.4, metalness: 0.4 });
+                const slateRoofMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.4 });
                 const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.85, roughness: 0.25 });
 
                 // Aile Richelieu (North Palace Wing)
@@ -662,7 +703,7 @@
                 denonRoof.position.set(56, 31, 50);
                 this.scene.add(denonWing, denonRoof);
 
-                // Eastern Palace Clock Tower
+                // Pavillon Sully / Pavillon de l'Horloge (Eastern Clock Tower)
                 const clockTower = new THREE.Mesh(new THREE.BoxGeometry(32, 28, 12), palaceMat);
                 clockTower.position.set(0, 18, -60);
                 const clockDome = new THREE.Mesh(new THREE.ConeGeometry(18, 14, 4), slateRoofMat);
@@ -674,50 +715,69 @@
             }
 
             // ----------------------------------------------------
-            // 💎 GIANT GLASS PYRAMID (BREAKABLE BARRIER AT Z = 36)
+            // 💎 GIANT GLASS PYRAMID (DAYLIGHT CLEAR GLASS)
             // ----------------------------------------------------
             buildGiantGlassPyramid() {
                 this.giantPyramidGroup = new THREE.Group();
                 this.giantPyramidGroup.position.set(0, 0, 36);
 
-                // Monumental Glass Facets (30m wide, 20m high)
-                const pyrGeo = new THREE.ConeGeometry(22, 18, 4);
+                const pyrTex = this.generatePyramidDiamondTexture();
+                const pyrGeo = new THREE.ConeGeometry(24, 18, 4);
                 pyrGeo.rotateY(Math.PI / 4);
                 const pyrMat = new THREE.MeshStandardMaterial({
-                    color: 0x67e8f9,
+                    map: pyrTex,
+                    color: 0xe0f2fe,
                     transparent: true,
-                    opacity: 0.88,
-                    roughness: 0.05,
-                    metalness: 0.92
+                    opacity: 0.82,
+                    roughness: 0.08,
+                    metalness: 0.9
                 });
                 this.pyrMesh = new THREE.Mesh(pyrGeo, pyrMat);
                 this.pyrMesh.position.y = 9.0;
                 this.giantPyramidGroup.add(this.pyrMesh);
 
-                // Intricate Diamond Steel Trusses
-                const wireGeo = new THREE.ConeGeometry(22.08, 18.08, 4, 10);
-                wireGeo.rotateY(Math.PI / 4);
-                const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
-                this.pyrWire = new THREE.Mesh(wireGeo, wireMat);
-                this.pyrWire.position.y = 9.0;
-                this.giantPyramidGroup.add(this.pyrWire);
+                // 3 Minor Glass Pyramidions (flanking the main pyramid like in real Louvre!)
+                const miniPyrMat = new THREE.MeshStandardMaterial({
+                    map: pyrTex,
+                    color: 0xe0f2fe,
+                    transparent: true,
+                    opacity: 0.8,
+                    roughness: 0.08,
+                    metalness: 0.9
+                });
+                const miniPyrGeo = new THREE.ConeGeometry(4.5, 3.5, 4);
+                miniPyrGeo.rotateY(Math.PI / 4);
 
-                // Warm Interior Golden Core Light
-                this.pyrLight = new THREE.PointLight(0xfbbf24, 1.2, 25);
-                this.pyrLight.position.set(0, 6, 0);
-                this.giantPyramidGroup.add(this.pyrLight);
+                [-18, 18].forEach(x => {
+                    const miniPyr = new THREE.Mesh(miniPyrGeo, miniPyrMat);
+                    miniPyr.position.set(x, 1.75, 48);
+                    this.scene.add(miniPyr);
+                });
+                const southMiniPyr = new THREE.Mesh(miniPyrGeo, miniPyrMat);
+                southMiniPyr.position.set(0, 1.75, 20);
+                this.scene.add(southMiniPyr);
 
                 this.scene.add(this.giantPyramidGroup);
+                // Animated Fountain Spray Jets in Water Pools
+                const sprayMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 });
+                for (let i = 0; i < 16; i++) {
+                    const spray = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.4, 3, 6), sprayMat);
+                    const fx = (i % 2 === 0 ? -1 : 1) * (18 + (i % 4) * 2);
+                    const fz = 24 + (i % 5) * 6;
+                    spray.position.set(fx, 1.5, fz);
+                    this.scene.add(spray);
+                }
 
-                // 4 Granite Reflecting Water Pools surrounding the pyramid
+
+                // 4 Crystalline Reflecting Water Pools with Mirror Reflections
                 const waterMat = new THREE.MeshStandardMaterial({
                     color: 0x0369a1,
-                    roughness: 0.08,
-                    metalness: 0.92,
+                    roughness: 0.05,
+                    metalness: 0.9,
                     transparent: true,
-                    opacity: 0.9
+                    opacity: 0.88
                 });
-                const graniteMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 });
+                const graniteMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.3 });
 
                 const poolConfigs = [
                     { x: -22, z: 36, w: 10, d: 24 },
@@ -740,7 +800,7 @@
             }
 
             // ----------------------------------------------------
-            // 🏰 OPULENT SUBTERRANEAN GRANDE GALERIE (Z <= 36)
+            // 🏰 OPULENT SUBTERRANEAN GRANDE GALERIE
             // ----------------------------------------------------
             buildSubterraneanGrandeGalerie() {
                 this.interiorGroup = new THREE.Group();
@@ -758,14 +818,12 @@
                 intGround.position.set(0, 0.05, -45);
                 this.interiorGroup.add(intGround);
 
-                // Royal Red Runner Carpet
                 const carpetMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.8 });
                 const redCarpet = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 170), carpetMat);
                 redCarpet.rotation.x = -Math.PI / 2;
                 redCarpet.position.set(0, 0.08, -45);
                 this.interiorGroup.add(redCarpet);
 
-                // Barrel-Vaulted Ceiling with Skylights
                 const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
                 const skylightMat = new THREE.MeshStandardMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.75, roughness: 0.1 });
                 const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
@@ -778,23 +836,17 @@
                 skylightStrip.position.set(0, 18.5, -45);
                 this.interiorGroup.add(ceilingLeft, ceilingRight, skylightStrip);
 
-                // Crimson Red Museum Gallery Walls
                 const crimsonWallMat = new THREE.MeshStandardMaterial({ color: 0x6b1111, roughness: 0.6 });
                 const leftWall = new THREE.Mesh(new THREE.BoxGeometry(4, 18, 170), crimsonWallMat);
                 leftWall.position.set(-34, 9, -45);
                 const rightWall = new THREE.Mesh(new THREE.BoxGeometry(4, 18, 170), crimsonWallMat);
                 rightWall.position.set(34, 9, -45);
-                this.interiorGroup.add(leftWall, rightWall);
-                // Enclosed Museum Back & Front Walls
-                const museumWallMat = new THREE.MeshStandardMaterial({ color: 0x6b1111, roughness: 0.6 });
-                const northWall = new THREE.Mesh(new THREE.BoxGeometry(68, 18, 4), museumWallMat);
+                const northWall = new THREE.Mesh(new THREE.BoxGeometry(68, 18, 4), crimsonWallMat);
                 northWall.position.set(0, 9, -130);
-                const southWall = new THREE.Mesh(new THREE.BoxGeometry(68, 18, 4), museumWallMat);
+                const southWall = new THREE.Mesh(new THREE.BoxGeometry(68, 18, 4), crimsonWallMat);
                 southWall.position.set(0, 9, 36);
-                this.interiorGroup.add(northWall, southWall);
+                this.interiorGroup.add(leftWall, rightWall, northWall, southWall);
 
-
-                // Carrara Marble Columns & Classical Statues
                 const marbleMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.18, metalness: 0.3 });
                 for (let z = 30; z >= -120; z -= 20) {
                     [-18, 18].forEach(x => {
@@ -818,7 +870,6 @@
                     this.interiorGroup.add(crossArch);
                 }
 
-                // Crystal Chandeliers
                 const crystalMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, metalness: 0.9 });
                 for (let z = 25; z >= -115; z -= 30) {
                     const chGroup = new THREE.Group();
@@ -877,7 +928,6 @@
                     ex.pinMesh = pinGroup;
                     this.pinMeshes.push(pinGroup);
 
-                    // Masterpiece Painting Frame in Aisle Bay
                     const frameGroup = new THREE.Group();
                     frameGroup.position.set(ex.pos.x, ex.pos.y, ex.pos.z);
                     frameGroup.rotation.y = ex.pos.x < 0 ? (Math.PI / 2 - 0.4) : (-Math.PI / 2 + 0.4);
@@ -1055,9 +1105,6 @@
                 this.car.chassis = this.carChassisGroup;
             }
 
-            // ----------------------------------------------------
-            // 💥 TRIGGER PYRAMID SHATTERING & INFILTRATION
-            // ----------------------------------------------------
             triggerPyramidBreach() {
                 if (this.pyramidShattered) return;
                 this.pyramidShattered = true;
@@ -1065,21 +1112,20 @@
                 this.playGlassCrashSound();
                 this.playAlarmSiren();
 
-                
-                // Reveal the Opulent Subterranean Grande Galerie
+                // Reveal Opulent Subterranean Gallery
                 if (this.interiorGroup) this.interiorGroup.visible = true;
                 EXHIBITS_DATA.forEach(ex => {
                     if (ex.mesh) ex.mesh.visible = true;
                     if (ex.pinMesh) ex.pinMesh.visible = true;
                 });
 
-                // Remove giant pyramid outer glass
+                // Remove giant pyramid glass
                 this.giantPyramidGroup.remove(this.pyrMesh);
                 this.giantPyramidGroup.remove(this.pyrWire);
 
                 // Explosive Glass Shards
                 const shardMat = new THREE.MeshStandardMaterial({
-                    color: 0x67e8f9,
+                    color: 0x93c5fd,
                     transparent: true,
                     opacity: 0.85,
                     roughness: 0.1,
@@ -1409,7 +1455,7 @@
                 if (this.car.pos.x < -32) { this.car.pos.x = -32; this.car.speed *= -0.3; }
                 if (this.car.pos.x > 32) { this.car.pos.x = 32; this.car.speed *= -0.3; }
                 if (this.car.pos.z > 95) { this.car.pos.z = 95; this.car.speed *= -0.3; }
-                if (this.car.pos.z < -125) { this.car.pos.z = -45; this.car.speed *= -0.3; }
+                if (this.car.pos.z < -125) { this.car.pos.z = -125; this.car.speed *= -0.3; }
 
                 // PYRAMID IMPACT BREACH TRIGGER AT Z = 36
                 if (!this.pyramidShattered && this.car.pos.z <= 38 && this.car.pos.z >= 32 && Math.abs(this.car.pos.x) < 18) {
@@ -1561,7 +1607,7 @@
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            new PyramidBreachGame();
+            new GoldenLouvreGame();
         });
     </script>
 </body>
