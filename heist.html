@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-slate-950">
 <head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏛️ The Louvre Heist | 60 FPS 3D Interactive Portfolio — Thiagarajan Hariharan</title>
@@ -54,8 +55,8 @@
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
             background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            
+            -webkit-
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
@@ -207,7 +208,7 @@
     </div>
 
     <!-- Masterpiece Inspection Modal -->
-    <div id="inspection-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="inspection-modal" class="fixed inset-0 z-50 bg-slate-950/85  flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
         <div class="max-w-2xl w-full glass-panel gold-border rounded-3xl p-6 sm:p-8 relative shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh] overflow-y-auto">
             
             <div class="flex justify-between items-start mb-4">
@@ -247,7 +248,7 @@
     </div>
 
     <!-- Safehouse Escape Payout Modal (Final Victory) -->
-    <div id="safehouse-modal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-500">
+    <div id="safehouse-modal" class="fixed inset-0 z-50 bg-slate-950/95  flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-500">
         <div class="max-w-2xl w-full glass-panel red-alert-pulse rounded-3xl p-6 sm:p-8 relative shadow-2xl text-center">
             
             <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg shadow-emerald-500/20">
@@ -461,7 +462,7 @@
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.enabled = false;
                 this.renderer.shadowMap.type = THREE.PCFShadowMap;
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
                 this.renderer.toneMappingExposure = 1.35;
@@ -636,7 +637,7 @@
 
                 const moonlight = new THREE.DirectionalLight(0xbdd7ee, 1.4);
                 moonlight.position.set(60, 90, 60);
-                moonlight.castShadow = true;
+                moonlight.castShadow = false;
                 moonlight.shadow.mapSize.width = 1024;
                 moonlight.shadow.mapSize.height = 1024;
                 this.scene.add(moonlight);
@@ -666,7 +667,7 @@
                 const extGround = new THREE.Mesh(extGeo, extMat);
                 extGround.rotation.x = -Math.PI / 2;
                 extGround.position.set(0, 0, 45);
-                extGround.receiveShadow = true;
+                extGround.receiveShadow = false;
                 this.scene.add(extGround);
 
                 const palaceMat = new THREE.MeshStandardMaterial({
@@ -679,7 +680,7 @@
 
                 const leftWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
                 leftWing.position.set(-55, 13, 40);
-                leftWing.castShadow = true;
+                leftWing.castShadow = false;
                 const leftRoof = new THREE.Mesh(new THREE.ConeGeometry(36, 12, 4), slateRoofMat);
                 leftRoof.position.set(-55, 32, 40);
                 leftRoof.rotation.y = Math.PI / 4;
@@ -687,7 +688,7 @@
 
                 const rightWing = new THREE.Mesh(new THREE.BoxGeometry(45, 26, 80), palaceMat);
                 rightWing.position.set(55, 13, 40);
-                rightWing.castShadow = true;
+                rightWing.castShadow = false;
                 const rightRoof = new THREE.Mesh(new THREE.ConeGeometry(36, 12, 4), slateRoofMat);
                 rightRoof.position.set(55, 32, 40);
                 rightRoof.rotation.y = Math.PI / 4;
@@ -805,7 +806,7 @@
                 const intGround = new THREE.Mesh(intGeo, intMat);
                 intGround.rotation.x = -Math.PI / 2;
                 intGround.position.set(0, 0.05, -75);
-                intGround.receiveShadow = true;
+                intGround.receiveShadow = false;
                 this.scene.add(intGround);
 
                 const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
@@ -827,7 +828,7 @@
                     [-22, 22].forEach(x => {
                         const col = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 18, 16), marbleMat);
                         col.position.set(x, 9, z);
-                        col.castShadow = true;
+                        col.castShadow = false;
                         this.scene.add(col);
 
                         const cap = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.2, 4.2), goldTrimMat);
@@ -989,7 +990,7 @@
 
                 const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 4.8), carPaintMat);
                 lowerBody.position.y = 0.45;
-                lowerBody.castShadow = true;
+                lowerBody.castShadow = false;
                 this.carChassisGroup.add(lowerBody);
 
                 const hood = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 1.8), carPaintMat);
@@ -1037,7 +1038,7 @@
 
                     const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.36, 14), tireRubberMat);
                     tire.rotation.z = Math.PI / 2;
-                    tire.castShadow = true;
+                    tire.castShadow = false;
                     holder.add(tire);
 
                     const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.38, 8), chromeMat);
