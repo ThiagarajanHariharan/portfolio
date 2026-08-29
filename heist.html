@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏎️ The Louvre Heist v2.0 | 3D Getaway Car Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="Ram a getaway sports car into the Louvre, escape AI police interceptors, dodge helicopter searchlights, steal engineering project masterpieces, and escape to the safehouse!">
+    <title>🏎️ The Louvre Heist | 3D Interactive Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="An interactive 3D getaway car portfolio. Drive through the Louvre, explore engineering project exhibits, and escape to the safehouse!">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🏎️ The Louvre Heist v2.0 | 3D Interactive Portfolio">
-    <meta property="og:description" content="A 3D getaway car heist portfolio with Police AI chases, Nitro boost, and Three.js physics.">
+    <meta property="og:title" content="🏎️ The Louvre Heist | 3D Interactive Portfolio">
+    <meta property="og:description" content="A 3D getaway car heist portfolio experience built with Three.js.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
     <meta name="theme-color" content="#020617">
@@ -16,7 +16,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +33,6 @@
                         gold: "#fbbf24",
                         heistRed: "#ef4444",
                         heistCyan: "#06b6d4",
-                        nosBlue: "#00f2ff"
                     }
                 }
             }
@@ -47,7 +46,7 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #020617; }
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.82);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -63,20 +62,8 @@
             0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.6); }
             100% { box-shadow: 0 0 45px rgba(239, 68, 68, 0.95); border-color: rgba(239, 68, 68, 1); }
         }
-        .wanted-star {
-            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
-            animation: starPulse 1s infinite alternate;
-        }
-        @keyframes starPulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
-        .speed-lines {
-            background: radial-gradient(circle, transparent 50%, rgba(6, 182, 212, 0.25) 90%, rgba(6, 182, 212, 0.5) 100%);
-            pointer-events: none;
-        }
         .scanline {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
@@ -87,9 +74,8 @@
     <!-- 3D Game Canvas Viewport -->
     <div id="game-container" class="w-full h-full absolute inset-0"></div>
     <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-30"></div>
-    <div id="speed-lines-overlay" class="speed-lines absolute inset-0 z-10 pointer-events-none opacity-0 transition-opacity duration-200"></div>
 
-    <!-- Top Mission & Wanted HUD -->
+    <!-- Top Mission & Status HUD -->
     <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         
         <!-- Mission Status -->
@@ -98,29 +84,18 @@
                 🏎️
             </div>
             <div>
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400">OPERATION: LOUVRE HEIST v2.0</span>
-                    <!-- Wanted Stars -->
-                    <div class="flex items-center gap-0.5 text-xs text-amber-500" id="wanted-stars-container">
-                        <span class="opacity-30">⭐</span>
-                        <span class="opacity-30">⭐</span>
-                        <span class="opacity-30">⭐</span>
-                        <span class="opacity-30">⭐</span>
-                        <span class="opacity-30">⭐</span>
-                    </div>
-                </div>
+                <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400">OPERATION: LOUVRE INFILTRATION</div>
                 <div class="text-sm font-cyber font-extrabold text-white flex items-center gap-2" id="mission-objective">
                     RAM THE GLASS PYRAMID AT FULL SPEED!
                 </div>
             </div>
         </div>
 
-        <!-- Loot Bag, Radio & Exit -->
-        <div class="flex items-center gap-2 pointer-events-auto">
-            <!-- Radio Button -->
-            <button id="radio-toggle-btn" class="glass-panel hover:bg-cyan-950/60 text-cyan-400 px-3 py-2.5 rounded-2xl font-mono text-xs border border-cyan-500/40 transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/10 cursor-pointer">
-                <span id="radio-icon">📻</span>
-                <span id="radio-label">SYNTHWAVE: ON</span>
+        <!-- Radar Mini-Map, Camera & Exit -->
+        <div class="flex items-center gap-3 pointer-events-auto">
+            <!-- Camera Toggle Button -->
+            <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg">
+                <span>🎥</span> <span id="cam-label">CAM: CHASE</span>
             </button>
 
             <!-- Loot Bag -->
@@ -132,6 +107,11 @@
                         <span id="stolen-count" class="text-amber-300">0</span> / 4 STOLEN
                     </div>
                 </div>
+            </div>
+
+            <!-- Mini-Map Radar -->
+            <div class="glass-panel rounded-2xl p-1.5 border border-slate-700/80 shadow-2xl relative">
+                <canvas id="radar-canvas" width="76" height="76" class="rounded-xl block"></canvas>
             </div>
 
             <a href="index.html" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-medium text-xs border border-slate-700 transition-all flex items-center gap-1.5">
@@ -148,9 +128,9 @@
         </div>
     </div>
 
-    <!-- Bottom Left: Speedometer & Nitro Boost HUD -->
+    <!-- Bottom Left: Speedometer & Controls HUD -->
     <div class="absolute bottom-4 left-4 z-20 pointer-events-none flex flex-col gap-2">
-        <div class="glass-panel rounded-2xl p-4 w-52 border border-slate-700/60 pointer-events-auto shadow-2xl">
+        <div class="glass-panel rounded-2xl p-4 w-48 border border-slate-700/60 pointer-events-auto shadow-2xl">
             <div class="flex justify-between items-center mb-1">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">VELOCITY</span>
                 <span class="text-xs font-mono text-cyan-400" id="gear-indicator">GEAR 1</span>
@@ -160,29 +140,17 @@
                 <span class="text-xs text-slate-400 font-mono">KM/H</span>
             </div>
             
-            <!-- Speed Progress Bar -->
             <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
                 <div id="speedometer-bar" class="bg-gradient-to-r from-cyan-400 via-emerald-400 to-red-500 h-full w-0 transition-all duration-75"></div>
-            </div>
-
-            <!-- Nitro Tank Meter -->
-            <div class="mt-3">
-                <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
-                    <span class="text-cyan-300 font-bold flex items-center gap-1">⚡ NITRO [SHIFT]</span>
-                    <span id="nitro-val" class="text-cyan-400 font-mono">100%</span>
-                </div>
-                <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-cyan-500/30">
-                    <div id="nitro-bar" class="bg-gradient-to-r from-blue-500 to-cyan-300 h-full w-full transition-all duration-75"></div>
-                </div>
             </div>
         </div>
 
         <div class="glass-panel rounded-xl px-3 py-2 text-[11px] text-slate-300 border border-slate-700/50 flex flex-wrap items-center gap-2">
-            <span>🎮 <strong>WASD:</strong> Drive</span>
-            <span>•</span>
-            <span><strong class="text-cyan-400">SHIFT:</strong> Nitro</span>
+            <span>🎮 <strong>WASD / Arrows:</strong> Drive</span>
             <span>•</span>
             <span><strong class="text-amber-400">SPACE:</strong> Drift</span>
+            <span>•</span>
+            <span><strong class="text-cyan-400">C:</strong> Camera</span>
             <span>•</span>
             <span><strong>R:</strong> Reset</span>
         </div>
@@ -192,7 +160,6 @@
     <div class="absolute bottom-5 right-5 z-20 md:hidden flex flex-col gap-2.5 pointer-events-auto select-none">
         <div class="flex justify-center gap-2">
             <button id="touch-up" class="w-14 h-14 glass-panel active:bg-cyan-600/60 rounded-2xl flex items-center justify-center text-2xl active:scale-95 border border-slate-600">⬆️</button>
-            <button id="touch-boost" class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 active:from-cyan-400 text-slate-950 font-cyber font-black text-xs rounded-2xl flex items-center justify-center shadow-lg active:scale-95 border border-cyan-300">NOS</button>
         </div>
         <div class="flex gap-2">
             <button id="touch-left" class="w-14 h-14 glass-panel active:bg-cyan-600/60 rounded-2xl flex items-center justify-center text-2xl active:scale-95 border border-slate-600">⬅️</button>
@@ -202,63 +169,6 @@
         <button id="touch-action" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold rounded-2xl shadow-lg text-xs">
             [E] INSPECT / STEAL
         </button>
-    </div>
-
-    <!-- 🚗 Garage & Vehicle Selector Modal (Intro) -->
-    <div id="garage-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-2xl flex items-center justify-center p-4">
-        <div class="max-w-3xl w-full glass-panel gold-border rounded-3xl p-6 sm:p-8 text-center relative shadow-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-xs font-mono text-red-400 uppercase tracking-widest mb-3">
-                🚨 SELECT YOUR GETAWAY VEHICLE
-            </div>
-            <h1 class="text-3xl sm:text-4xl font-museum font-bold text-white mb-2">OPERATION: LOUVRE HEIST v2.0</h1>
-            <p class="text-slate-300 text-sm max-w-xl mx-auto mb-6">
-                Ram the glass pyramid, evade AI police interceptors & attack helicopters, steal Hariharan's 4 engineering masterpieces, and escape to the safehouse!
-            </p>
-
-            <!-- 3 Selectable Cars -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-left">
-                <!-- Car 1: The Crimson Phantom -->
-                <div class="car-card p-4 rounded-2xl border-2 border-red-500 bg-slate-900/80 cursor-pointer hover:scale-105 transition-all" data-car="phantom">
-                    <div class="text-2xl mb-1">🏎️</div>
-                    <div class="font-cyber font-bold text-white text-sm">Crimson Phantom</div>
-                    <div class="text-[11px] text-slate-400 mb-2">Agile Drift Coupe</div>
-                    <div class="space-y-1 text-[10px] font-mono text-slate-300">
-                        <div>SPEED: <span class="text-amber-400">★★★★☆</span></div>
-                        <div>DRIFT: <span class="text-cyan-400">★★★★★</span></div>
-                        <div>ARMOR: <span class="text-slate-400">★★★☆☆</span></div>
-                    </div>
-                </div>
-
-                <!-- Car 2: Monaco V12 Hypercar -->
-                <div class="car-card p-4 rounded-2xl border border-slate-700 bg-slate-900/60 cursor-pointer hover:border-amber-400 hover:scale-105 transition-all" data-car="monaco">
-                    <div class="text-2xl mb-1">⚡</div>
-                    <div class="font-cyber font-bold text-white text-sm">Monaco V12</div>
-                    <div class="text-[11px] text-slate-400 mb-2">Hyperspeed Bullet</div>
-                    <div class="space-y-1 text-[10px] font-mono text-slate-300">
-                        <div>SPEED: <span class="text-amber-400">★★★★★</span></div>
-                        <div>DRIFT: <span class="text-cyan-400">★★★☆☆</span></div>
-                        <div>ARMOR: <span class="text-slate-400">★★☆☆☆</span></div>
-                    </div>
-                </div>
-
-                <!-- Car 3: Armored Enforcer -->
-                <div class="car-card p-4 rounded-2xl border border-slate-700 bg-slate-900/60 cursor-pointer hover:border-emerald-400 hover:scale-105 transition-all" data-car="enforcer">
-                    <div class="text-2xl mb-1">🛡️</div>
-                    <div class="font-cyber font-bold text-white text-sm">Armored Enforcer</div>
-                    <div class="text-[11px] text-slate-400 mb-2">Heavy Tactical SUV</div>
-                    <div class="space-y-1 text-[10px] font-mono text-slate-300">
-                        <div>SPEED: <span class="text-amber-400">★★★☆☆</span></div>
-                        <div>DRIFT: <span class="text-cyan-400">★★★☆☆</span></div>
-                        <div>ARMOR: <span class="text-emerald-400">★★★★★</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Start Button -->
-            <button id="start-engine-btn" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-slate-950 font-cyber font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-amber-500/20 active:scale-95 transition-all cursor-pointer">
-                🔥 START ENGINE & SMASH PYRAMID
-            </button>
-        </div>
     </div>
 
     <!-- Masterpiece Inspection Modal -->
@@ -271,15 +181,14 @@
                     <h2 class="text-2xl sm:text-3xl font-museum font-bold text-white mt-3" id="modal-title">The Cloud Bastion</h2>
                     <p class="text-xs font-mono text-slate-400" id="modal-subtitle">Medium: AWS EKS, Multi-AZ VPC, Terraform</p>
                 </div>
-                <button id="close-modal-btn" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                <button id="close-modal-btn" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
                     ✕
                 </button>
             </div>
 
-            <div class="w-full h-48 sm:h-60 rounded-2xl overflow-hidden border border-slate-700 bg-slate-900 my-4 flex items-center justify-center relative shadow-inner">
-                <div id="modal-artwork-visual" class="w-full h-full flex items-center justify-center text-5xl">
-                    🏛️
-                </div>
+            <!-- Exhibit Image / Preview -->
+            <div class="w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-slate-700 bg-slate-900 my-4 flex items-center justify-center relative shadow-inner">
+                <canvas id="modal-canvas-preview" width="640" height="360" class="w-full h-full object-cover"></canvas>
             </div>
 
             <div class="text-slate-300 text-sm leading-relaxed mb-6 space-y-2">
@@ -296,7 +205,7 @@
                 <a id="modal-github-link" href="#" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-white text-xs flex items-center gap-1.5 underline">
                     View Live Repository ↗
                 </a>
-                <button id="steal-artwork-btn" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-cyber font-black text-sm px-6 py-3 rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 active:scale-95 transition-all">
+                <button id="steal-artwork-btn" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-cyber font-black text-sm px-6 py-3 rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 active:scale-95 transition-all cursor-pointer">
                     <span>💰</span> STEAL MASTERPIECE
                 </button>
             </div>
@@ -314,7 +223,7 @@
             <div class="text-xs font-mono text-emerald-400 uppercase tracking-widest mb-1">ENCRYPTED TRANSMISSION FROM THE AGENT</div>
             <h2 class="text-3xl font-cyber font-black text-white mb-2">HEIST SUCCESSFUL. REPOSITORIES SECURED.</h2>
             <p class="text-slate-400 text-sm max-w-lg mx-auto mb-6">
-                "Outstanding driving, operative. You breached the Louvre, liberated Hariharan's engineering masterpieces, and escaped the authorities. Here are your decrypted GitHub access keys."
+                "Outstanding driving, operative. You breached the Louvre, liberated Hariharan's engineering masterpieces, and reached the extraction tunnel. Here are your decrypted repository keys."
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left mb-6">
@@ -356,6 +265,7 @@
                 title: "The Cloud Bastion (Campus Found)",
                 subtitle: "AWS EKS, Terraform, Multi-AZ VPC, RDS",
                 icon: "☁️",
+                color: "#0284c7",
                 desc: "Containerized lost-and-found platform deployed on AWS EKS across a Multi-AZ VPC with automated Terraform infrastructure and Gemini AI verification.",
                 tags: ["AWS EKS", "Multi-AZ VPC", "Terraform", "PostgreSQL"],
                 github: "https://github.com/ThiagarajanHariharan/campus-found",
@@ -368,6 +278,7 @@
                 title: "The Cyber Kinematic (Quartermaster)",
                 subtitle: "Flutter, ML Kit, fllama Offline LLM, 320 Tests",
                 icon: "🛡️",
+                color: "#10b981",
                 desc: "Military fitness accountability app with 100% offline edge computer vision pose tracking, 1-Euro adaptive jitter filter, local AI audio coaching, and zero-cloud P2P mesh sync.",
                 tags: ["Flutter", "Google ML Kit", "fllama LLM", "320 Tests"],
                 github: "https://github.com/ThiagarajanHariharan/Quartermaster",
@@ -380,6 +291,7 @@
                 title: "The Silicon Oracle (M1 Edge Pipeline)",
                 subtitle: "Qwen2.5-VL 7B, Whisper, Apple Silicon Edge",
                 icon: "🧠",
+                color: "#8b5cf6",
                 desc: "Zero-cloud multi-modal video intelligence pipeline processing 90-minute technical recordings on local M1 hardware with 11h sustained 100% GPU performance at 71°C.",
                 tags: ["Qwen2.5-VL", "Whisper", "Apple Silicon", "FFmpeg"],
                 github: "https://github.com/ThiagarajanHariharan/autovideoclipper",
@@ -392,6 +304,7 @@
                 title: "The Campus Quest (Campquest Go)",
                 subtitle: "Docker, Kubernetes, Strava API, Microservices",
                 icon: "🚴",
+                color: "#f59e0b",
                 desc: "Location-aware microservices ecosystem integrating Strava fitness workout points, geofenced ordering, and containerized Docker/Kubernetes architecture.",
                 tags: ["Docker", "Kubernetes", "Strava API", "Node.js"],
                 github: "https://github.com/ThiagarajanHariharan/Campquest",
@@ -400,31 +313,22 @@
             }
         ];
 
-        const CAR_PRESETS = {
-            phantom: { name: "Crimson Phantom", color: 0xef4444, maxSpeed: 1.05, accel: 0.018, friction: 0.965, driftFactor: 0.055 },
-            monaco: { name: "Monaco V12", color: 0xf59e0b, maxSpeed: 1.35, accel: 0.024, friction: 0.975, driftFactor: 0.045 },
-            enforcer: { name: "Armored Enforcer", color: 0x10b981, maxSpeed: 0.92, accel: 0.015, friction: 0.955, driftFactor: 0.065 }
-        };
-
         class LouvreHeistGame {
             constructor() {
                 this.container = document.getElementById("game-container");
                 this.speedometerVal = document.getElementById("speedometer-val");
                 this.speedometerBar = document.getElementById("speedometer-bar");
                 this.gearIndicator = document.getElementById("gear-indicator");
-                this.nitroBar = document.getElementById("nitro-bar");
-                this.nitroVal = document.getElementById("nitro-val");
-                this.speedLinesOverlay = document.getElementById("speed-lines-overlay");
                 this.proximityPrompt = document.getElementById("proximity-prompt");
                 this.proximityText = document.getElementById("proximity-text");
                 this.missionObjective = document.getElementById("mission-objective");
                 this.stolenCountEl = document.getElementById("stolen-count");
-                this.wantedStarsContainer = document.getElementById("wanted-stars-container");
-                this.radioToggleBtn = document.getElementById("radio-toggle-btn");
-                this.radioLabel = document.getElementById("radio-label");
+                this.camToggleBtn = document.getElementById("cam-toggle-btn");
+                this.camLabel = document.getElementById("cam-label");
+                this.radarCanvas = document.getElementById("radar-canvas");
+                this.radarCtx = this.radarCanvas.getContext("2d");
                 
                 // Modals
-                this.garageModal = document.getElementById("garage-modal");
                 this.inspectionModal = document.getElementById("inspection-modal");
                 this.modalWing = document.getElementById("modal-wing");
                 this.modalTitle = document.getElementById("modal-title");
@@ -432,15 +336,14 @@
                 this.modalDesc = document.getElementById("modal-desc");
                 this.modalTags = document.getElementById("modal-tags");
                 this.modalGithub = document.getElementById("modal-github-link");
-                this.modalArtworkVisual = document.getElementById("modal-artwork-visual");
+                this.modalCanvasPreview = document.getElementById("modal-canvas-preview");
                 this.stealBtn = document.getElementById("steal-artwork-btn");
                 this.closeModalBtn = document.getElementById("close-modal-btn");
                 this.safehouseModal = document.getElementById("safehouse-modal");
                 this.restartBtn = document.getElementById("restart-heist-btn");
 
-                // Selected Car
-                this.selectedCarType = "phantom";
-                this.carPreset = CAR_PRESETS.phantom;
+                // Camera Mode
+                this.camMode = "chase"; // 'chase' or 'topdown'
 
                 // Game State
                 this.stolenExhibits = new Set();
@@ -448,21 +351,21 @@
                 this.activeExhibit = null;
                 this.modalOpen = false;
                 this.heistComplete = false;
-                this.wantedLevel = 0;
-                this.radioPlaying = true;
-
-                // Nitro NOS State
-                this.nitroRemaining = 100;
-                this.isBoosting = false;
 
                 // Car Physics State
                 this.car = {
                     pos: new THREE.Vector3(0, 0.5, 55),
                     vel: new THREE.Vector3(0, 0, 0),
                     speed: 0,
+                    maxSpeed: 1.15,
+                    accel: 0.022,
+                    friction: 0.965,
+                    steerAngle: 0,
                     heading: Math.PI,
                     mesh: null,
-                    flames: []
+                    chassis: null,
+                    frontWheels: [],
+                    rearWheels: []
                 };
 
                 // Controls Input
@@ -471,20 +374,16 @@
                     down: false,
                     left: false,
                     right: false,
-                    drift: false,
-                    boost: false
+                    drift: false
                 };
 
-                // Particle systems & Entities
                 this.shards = [];
                 this.smokeParticles = [];
-                this.policeCars = [];
-                this.helicopter = null;
                 
                 // Web Audio Context
                 this.audioCtx = null;
+                this.engineGain = null;
                 this.engineOsc = null;
-                this.radioInterval = null;
 
                 this.init();
             }
@@ -492,7 +391,7 @@
             init() {
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x040711);
-                this.scene.fog = new THREE.FogExp2(0x040711, 0.011);
+                this.scene.fog = new THREE.FogExp2(0x040711, 0.012);
 
                 this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 350);
                 
@@ -508,8 +407,6 @@
                 this.buildLouvrePyramid();
                 this.buildGrandGallery();
                 this.buildCar();
-                this.buildHelicopter();
-                this.buildPoliceAI();
                 this.bindEvents();
 
                 window.addEventListener("resize", () => this.onResize());
@@ -517,10 +414,10 @@
             }
 
             setupLighting() {
-                const ambient = new THREE.AmbientLight(0x1e293b, 1.2);
+                const ambient = new THREE.AmbientLight(0x1e293b, 1.4);
                 this.scene.add(ambient);
 
-                const moonlight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+                const moonlight = new THREE.DirectionalLight(0x38bdf8, 0.9);
                 moonlight.position.set(50, 90, 50);
                 moonlight.castShadow = true;
                 moonlight.shadow.mapSize.width = 2048;
@@ -603,6 +500,60 @@
                 this.scene.add(this.pyramidGroup);
             }
 
+            createExhibitTexture(exhibit) {
+                const canvas = document.createElement("canvas");
+                canvas.width = 512;
+                canvas.height = 320;
+                const ctx = canvas.getContext("2d");
+
+                // Background
+                ctx.fillStyle = "#0f172a";
+                ctx.fillRect(0, 0, 512, 320);
+
+                // Accent border
+                ctx.strokeStyle = exhibit.color;
+                ctx.lineWidth = 8;
+                ctx.strokeRect(8, 8, 496, 304);
+
+                // Top Wing header
+                ctx.fillStyle = exhibit.color;
+                ctx.fillRect(8, 8, 496, 44);
+                ctx.fillStyle = "#020617";
+                ctx.font = "bold 18px Orbitron, sans-serif";
+                ctx.fillText(exhibit.wing, 24, 36);
+
+                // Title & Subtitle
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 26px Cinzel, serif";
+                ctx.fillText(exhibit.title, 24, 95);
+
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "14px Inter, sans-serif";
+                ctx.fillText(exhibit.subtitle, 24, 125);
+
+                // Icon Preview
+                ctx.font = "64px serif";
+                ctx.fillText(exhibit.icon, 380, 180);
+
+                // Tech tags
+                let tagX = 24;
+                exhibit.tags.forEach(tag => {
+                    ctx.fillStyle = "#1e293b";
+                    ctx.fillRect(tagX, 250, ctx.measureText(tag).width + 24, 32);
+                    ctx.strokeStyle = "#334155";
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(tagX, 250, ctx.measureText(tag).width + 24, 32);
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.font = "bold 13px Orbitron, sans-serif";
+                    ctx.fillText(tag, tagX + 12, 271);
+                    tagX += ctx.measureText(tag).width + 36;
+                });
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                return { texture, canvas };
+            }
+
             buildGrandGallery() {
                 const marbleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2, metalness: 0.3 });
                 const goldMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.8, roughness: 0.3 });
@@ -627,10 +578,20 @@
                     const frame = new THREE.Mesh(new THREE.BoxGeometry(10, 6, 0.4), goldMat);
                     frameGroup.add(frame);
 
-                    const canvasMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+                    const { texture, canvas } = this.createExhibitTexture(ex);
+                    ex.canvas = canvas;
+
+                    const canvasMat = new THREE.MeshBasicMaterial({ map: texture });
                     const painting = new THREE.Mesh(new THREE.PlaneGeometry(9, 5), canvasMat);
                     painting.position.z = 0.22;
                     frameGroup.add(painting);
+
+                    // Holographic Proximity Ring on floor
+                    const ringMat = new THREE.MeshBasicMaterial({ color: ex.color, wireframe: true });
+                    const ring = new THREE.Mesh(new THREE.RingGeometry(3.5, 4.5, 16), ringMat);
+                    ring.rotation.x = -Math.PI / 2;
+                    ring.position.set(0, -3.4, 4.0);
+                    frameGroup.add(ring);
 
                     const spot = new THREE.SpotLight(0xffedd5, 2.5, 25, Math.PI / 4, 0.5);
                     spot.position.set(ex.pos.x < 0 ? ex.pos.x + 8 : ex.pos.x - 8, 12, ex.pos.z);
@@ -650,158 +611,75 @@
             }
 
             buildCar() {
-                if (this.carGroup) this.scene.remove(this.carGroup);
                 this.carGroup = new THREE.Group();
 
-                const bodyMat = new THREE.MeshStandardMaterial({ color: this.carPreset.color, roughness: 0.2, metalness: 0.8 });
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2, metalness: 0.8 });
                 const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
                 const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
+
+                // Chassis container for suspension tilting
+                this.carChassisGroup = new THREE.Group();
+                this.carGroup.add(this.carChassisGroup);
 
                 const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.8, 4.8), bodyMat);
                 chassis.position.y = 0.6;
                 chassis.castShadow = true;
-                this.carGroup.add(chassis);
+                this.carChassisGroup.add(chassis);
 
                 const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.7, 2.4), glassMat);
                 cabin.position.set(0, 1.25, -0.3);
-                this.carGroup.add(cabin);
+                this.carChassisGroup.add(cabin);
 
                 const spoiler = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 0.6), bodyMat);
                 spoiler.position.set(0, 1.3, 2.1);
-                this.carGroup.add(spoiler);
+                this.carChassisGroup.add(spoiler);
 
-                // Nitro Exhaust Flames
-                const flameGeo = new THREE.ConeGeometry(0.3, 1.2, 8);
-                flameGeo.rotateX(-Math.PI / 2);
-                const flameMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0 });
-                
-                const flameL = new THREE.Mesh(flameGeo, flameMat);
-                flameL.position.set(-0.6, 0.4, 2.8);
-                const flameR = new THREE.Mesh(flameGeo, flameMat);
-                flameR.position.set(0.6, 0.4, 2.8);
-                this.carGroup.add(flameL);
-                this.carGroup.add(flameR);
-                this.car.flames = [flameL, flameR];
+                // Front Wheels (Steerable)
+                this.car.frontWheels = [];
+                [[-1.3, 0.4, -1.4], [1.3, 0.4, -1.4]].forEach(([x, y, z]) => {
+                    const wheelHolder = new THREE.Group();
+                    wheelHolder.position.set(x, y, z);
 
-                // 4 Wheels
-                const wheelPositions = [
-                    [-1.3, 0.4, 1.4], [1.3, 0.4, 1.4],
-                    [-1.3, 0.4, -1.4], [1.3, 0.4, -1.4]
-                ];
-                wheelPositions.forEach(([x, y, z]) => {
+                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
+                    wheel.rotation.z = Math.PI / 2;
+                    wheel.castShadow = true;
+                    wheelHolder.add(wheel);
+
+                    this.carGroup.add(wheelHolder);
+                    this.car.frontWheels.push({ holder: wheelHolder, wheel: wheel });
+                });
+
+                // Rear Wheels
+                this.car.rearWheels = [];
+                [[-1.3, 0.4, 1.4], [1.3, 0.4, 1.4]].forEach(([x, y, z]) => {
                     const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
                     wheel.rotation.z = Math.PI / 2;
                     wheel.position.set(x, y, z);
                     wheel.castShadow = true;
                     this.carGroup.add(wheel);
+                    this.car.rearWheels.push(wheel);
                 });
 
                 // Headlights
                 const headL = new THREE.SpotLight(0xffffff, 3.5, 50, Math.PI / 5, 0.4);
                 headL.position.set(-0.8, 0.7, -2.4);
                 headL.target.position.set(-0.8, 0, -20);
-                this.carGroup.add(headL);
-                this.carGroup.add(headL.target);
+                this.carGroup.add(headL, headL.target);
 
                 const headR = new THREE.SpotLight(0xffffff, 3.5, 50, Math.PI / 5, 0.4);
                 headR.position.set(0.8, 0.7, -2.4);
                 headR.target.position.set(0.8, 0, -20);
-                this.carGroup.add(headR);
-                this.carGroup.add(headR.target);
+                this.carGroup.add(headR, headR.target);
 
                 this.carGroup.position.copy(this.car.pos);
                 this.scene.add(this.carGroup);
                 this.car.mesh = this.carGroup;
-            }
-
-            buildPoliceAI() {
-                const copMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.7 });
-                const copWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
-                const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111827 });
-
-                const spawnPoints = [{ x: -20, z: 70 }, { x: 20, z: 70 }];
-                this.policeCars = spawnPoints.map((pt, idx) => {
-                    const copGroup = new THREE.Group();
-                    copGroup.position.set(pt.x, 0.5, pt.z);
-
-                    const body = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.7, 4.6), copMat);
-                    body.position.y = 0.55;
-                    copGroup.add(body);
-
-                    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.2), copWhiteMat);
-                    roof.position.set(0, 1.15, -0.2);
-                    copGroup.add(roof);
-
-                    const lightbarBlue = new THREE.PointLight(0x3b82f6, 0, 20);
-                    lightbarBlue.position.set(-0.5, 1.6, -0.2);
-                    const lightbarRed = new THREE.PointLight(0xef4444, 0, 20);
-                    lightbarRed.position.set(0.5, 1.6, -0.2);
-                    copGroup.add(lightbarBlue);
-                    copGroup.add(lightbarRed);
-
-                    [[-1.25, 0.38, 1.3], [1.25, 0.38, 1.3], [-1.25, 0.38, -1.3], [1.25, 0.38, -1.3]].forEach(([wx, wy, wz]) => {
-                        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.35, 12), wheelMat);
-                        wheel.rotation.z = Math.PI / 2;
-                        wheel.position.set(wx, wy, wz);
-                        copGroup.add(wheel);
-                    });
-
-                    copGroup.visible = false;
-                    this.scene.add(copGroup);
-
-                    return {
-                        mesh: copGroup,
-                        pos: new THREE.Vector3(pt.x, 0.5, pt.z),
-                        speed: 0,
-                        heading: Math.PI,
-                        active: false,
-                        lightBlue: lightbarBlue,
-                        lightRed: lightbarRed,
-                        idx: idx
-                    };
-                });
-            }
-
-            buildHelicopter() {
-                const heliGroup = new THREE.Group();
-                heliGroup.position.set(0, 32, 20);
-
-                const heliMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
-                const body = new THREE.Mesh(new THREE.BoxGeometry(3.5, 2.5, 7.5), heliMat);
-                heliGroup.add(body);
-
-                const tail = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 7.0), heliMat);
-                tail.position.set(0, 0.5, 6.0);
-                heliGroup.add(tail);
-
-                const rotorGeo = new THREE.BoxGeometry(14.0, 0.1, 0.8);
-                const rotorMat = new THREE.MeshBasicMaterial({ color: 0x334155 });
-                const rotor = new THREE.Mesh(rotorGeo, rotorMat);
-                rotor.position.y = 1.8;
-                heliGroup.add(rotor);
-
-                const searchlight = new THREE.SpotLight(0xfef08a, 0, 70, Math.PI / 6, 0.3);
-                searchlight.position.set(0, -1.0, 0);
-                searchlight.castShadow = true;
-                heliGroup.add(searchlight);
-                this.scene.add(searchlight.target);
-
-                heliGroup.visible = false;
-                this.scene.add(heliGroup);
-
-                this.helicopter = {
-                    group: heliGroup,
-                    rotor: rotor,
-                    searchlight: searchlight,
-                    target: searchlight.target,
-                    active: false
-                };
+                this.car.chassis = this.carChassisGroup;
             }
 
             triggerPyramidShatter() {
                 if (this.pyramidShattered) return;
                 this.pyramidShattered = true;
-                this.setWantedLevel(1);
 
                 this.playGlassCrashSound();
                 this.playAlarmSiren();
@@ -826,31 +704,8 @@
                     this.shards.push(shard);
                 }
 
-                this.missionObjective.textContent = "DRIFT GALLERIES & STEAL 4 MASTERPIECES!";
+                this.missionObjective.textContent = "DRIFT GALLERIES & STEAL ALL 4 MASTERPIECES!";
                 this.missionObjective.classList.add("text-amber-400");
-            }
-
-            setWantedLevel(stars) {
-                this.wantedLevel = Math.min(5, stars);
-                const starSpans = this.wantedStarsContainer.querySelectorAll("span");
-                starSpans.forEach((s, idx) => {
-                    if (idx < this.wantedLevel) {
-                        s.classList.remove("opacity-30");
-                        s.classList.add("wanted-star", "text-red-500");
-                    } else {
-                        s.classList.add("opacity-30");
-                        s.classList.remove("wanted-star", "text-red-500");
-                    }
-                });
-
-                if (this.wantedLevel >= 2) {
-                    this.policeCars.forEach(cop => { cop.active = true; cop.mesh.visible = true; });
-                }
-                if (this.wantedLevel >= 4 && this.helicopter) {
-                    this.helicopter.active = true;
-                    this.helicopter.group.visible = true;
-                    this.helicopter.searchlight.intensity = 5.0;
-                }
             }
 
             spawnDriftSmoke(x, z) {
@@ -880,41 +735,12 @@
                     this.engineOsc.connect(this.engineGain);
                     this.engineGain.connect(this.audioCtx.destination);
                     this.engineOsc.start();
-
-                    if (this.radioPlaying) this.startSynthwaveRadio();
                 } catch (e) {}
-            }
-
-            startSynthwaveRadio() {
-                if (this.radioInterval || !this.audioCtx) return;
-                const notes = [110, 130.81, 146.83, 164.81];
-                let step = 0;
-                this.radioInterval = setInterval(() => {
-                    if (!this.radioPlaying || !this.audioCtx) return;
-                    const osc = this.audioCtx.createOscillator();
-                    const gain = this.audioCtx.createGain();
-                    osc.type = "triangle";
-                    osc.frequency.setValueAtTime(notes[step % notes.length], this.audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.06, this.audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.2);
-                    osc.connect(gain);
-                    gain.connect(this.audioCtx.destination);
-                    osc.start();
-                    osc.stop(this.audioCtx.currentTime + 0.22);
-                    step++;
-                }, 220);
-            }
-
-            toggleRadio() {
-                this.radioPlaying = !this.radioPlaying;
-                this.radioLabel.textContent = this.radioPlaying ? "SYNTHWAVE: ON" : "RADIO: MUTED";
-                this.radioToggleBtn.classList.toggle("text-slate-400", !this.radioPlaying);
-                this.radioToggleBtn.classList.toggle("text-cyan-400", this.radioPlaying);
             }
 
             updateEngineAudio() {
                 if (!this.audioCtx || !this.engineOsc) return;
-                const rpmFreq = 60 + Math.abs(this.car.speed) * 200 + (this.isBoosting ? 140 : 0);
+                const rpmFreq = 60 + Math.abs(this.car.speed) * 220;
                 this.engineOsc.frequency.setTargetAtTime(rpmFreq, this.audioCtx.currentTime, 0.05);
             }
 
@@ -986,27 +812,10 @@
             }
 
             bindEvents() {
-                document.querySelectorAll(".car-card").forEach(card => {
-                    card.addEventListener("click", () => {
-                        document.querySelectorAll(".car-card").forEach(c => {
-                            c.classList.remove("border-2", "border-red-500", "border-amber-500", "border-emerald-500");
-                            c.classList.add("border-slate-700");
-                        });
-                        const type = card.dataset.car;
-                        this.selectedCarType = type;
-                        this.carPreset = CAR_PRESETS[type];
-                        card.classList.remove("border-slate-700");
-                        card.classList.add("border-2", type === "phantom" ? "border-red-500" : (type === "monaco" ? "border-amber-500" : "border-emerald-500"));
-                    });
+                this.camToggleBtn.addEventListener("click", () => {
+                    this.camMode = this.camMode === "chase" ? "topdown" : "chase";
+                    this.camLabel.textContent = this.camMode === "chase" ? "CAM: CHASE" : "CAM: RADAR";
                 });
-
-                document.getElementById("start-engine-btn").addEventListener("click", () => {
-                    this.initAudio();
-                    this.buildCar();
-                    this.garageModal.classList.add("hidden");
-                });
-
-                this.radioToggleBtn.addEventListener("click", () => this.toggleRadio());
 
                 const onKey = (e, isDown) => {
                     this.initAudio();
@@ -1016,8 +825,12 @@
                     if (key === "a" || key === "arrowleft") this.keys.left = isDown;
                     if (key === "d" || key === "arrowright") this.keys.right = isDown;
                     if (key === " ") this.keys.drift = isDown;
-                    if (e.key === "Shift") this.keys.boost = isDown;
                     
+                    if (isDown && key === "c") {
+                        this.camMode = this.camMode === "chase" ? "topdown" : "chase";
+                        this.camLabel.textContent = this.camMode === "chase" ? "CAM: CHASE" : "CAM: RADAR";
+                    }
+
                     if (isDown && (key === "e" || key === "enter")) {
                         if (this.activeExhibit && !this.modalOpen) {
                             this.openInspectionModal(this.activeExhibit);
@@ -1041,7 +854,6 @@
                 bindTouch("touch-down", "down");
                 bindTouch("touch-left", "left");
                 bindTouch("touch-right", "right");
-                bindTouch("touch-boost", "boost");
 
                 document.getElementById("touch-action")?.addEventListener("click", () => {
                     if (this.activeExhibit && !this.modalOpen) {
@@ -1063,6 +875,7 @@
                 this.car.vel.set(0, 0, 0);
                 this.car.speed = 0;
                 this.car.heading = Math.PI;
+                this.car.steerAngle = 0;
             }
 
             openInspectionModal(exhibit) {
@@ -1072,7 +885,12 @@
                 this.modalSubtitle.textContent = exhibit.subtitle;
                 this.modalDesc.textContent = exhibit.desc;
                 this.modalGithub.href = exhibit.github;
-                this.modalArtworkVisual.textContent = exhibit.icon;
+
+                // Render preview
+                const prevCtx = this.modalCanvasPreview.getContext("2d");
+                if (exhibit.canvas) {
+                    prevCtx.drawImage(exhibit.canvas, 0, 0, 640, 360);
+                }
 
                 this.modalTags.innerHTML = "";
                 exhibit.tags.forEach(t => {
@@ -1107,7 +925,6 @@
                 this.activeExhibit.stolen = true;
                 this.stolenExhibits.add(this.activeExhibit.id);
 
-                this.setWantedLevel(this.stolenExhibits.size + 1);
                 this.playCashRegisterSound();
 
                 this.activeExhibit.paintingMesh.material = new THREE.MeshBasicMaterial({
@@ -1119,57 +936,112 @@
                 this.closeInspectionModal();
 
                 if (this.stolenExhibits.size >= 4) {
-                    this.missionObjective.textContent = "🚨 5-STAR WANTED! ESCAPE TO SAFEHOUSE (NORTH END)!";
+                    this.missionObjective.textContent = "🚨 ALL ARTWORKS STOLEN! ESCAPE TO SAFEHOUSE (NORTH END)!";
                     this.missionObjective.classList.remove("text-amber-400");
-                    this.missionObjective.classList.add("text-red-500", "animate-pulse");
+                    this.missionObjective.classList.add("text-emerald-400");
                 }
             }
 
+            // ----------------------------------------------------
+            // 🗺️ 2D RADAR MINI-MAP RENDERER
+            // ----------------------------------------------------
+            drawRadar() {
+                const ctx = this.radarCtx;
+                const w = this.radarCanvas.width;
+                const h = this.radarCanvas.height;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Background
+                ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+                ctx.fillRect(0, 0, w, h);
+
+                // Radar Grids
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(w / 2, h / 2, 34, 0, Math.PI * 2);
+                ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Map coordinates: X is [-60, 60] -> [4, 72], Z is [-135, 75] -> [4, 72]
+                const mapX = (x) => ((x + 60) / 120) * (w - 12) + 6;
+                const mapZ = (z) => ((z + 135) / 210) * (h - 12) + 6;
+
+                // Exhibits
+                EXHIBITS_DATA.forEach(ex => {
+                    const exX = mapX(ex.pos.x);
+                    const exZ = mapZ(ex.pos.z);
+                    ctx.fillStyle = ex.stolen ? "#10b981" : "#fbbf24";
+                    ctx.beginPath();
+                    ctx.arc(exX, exZ, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Safehouse Exit
+                ctx.fillStyle = "#22c55e";
+                ctx.fillRect(mapX(0) - 4, mapZ(-130) - 2, 8, 4);
+
+                // Player Car Marker
+                const playerX = mapX(this.car.pos.x);
+                const playerZ = mapZ(this.car.pos.z);
+
+                ctx.save();
+                ctx.translate(playerX, playerZ);
+                ctx.rotate(this.car.heading + Math.PI);
+                ctx.fillStyle = "#ef4444";
+                ctx.beginPath();
+                ctx.moveTo(0, -5);
+                ctx.lineTo(-3.5, 4);
+                ctx.lineTo(3.5, 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // ----------------------------------------------------
+            // 🔄 PHYSICAL GAME & VEHICLE LOOP
+            // ----------------------------------------------------
             updateCarPhysics() {
                 if (this.modalOpen) {
                     this.car.speed *= 0.8;
                     return;
                 }
 
-                if (this.keys.boost && this.nitroRemaining > 5) {
-                    this.isBoosting = true;
-                    this.nitroRemaining = Math.max(0, this.nitroRemaining - 0.6);
-                    this.car.flames.forEach(f => f.material.opacity = 0.95);
-                    this.speedLinesOverlay.style.opacity = "0.7";
-                } else {
-                    this.isBoosting = false;
-                    this.nitroRemaining = Math.min(100, this.nitroRemaining + 0.15);
-                    this.car.flames.forEach(f => f.material.opacity = 0);
-                    this.speedLinesOverlay.style.opacity = "0";
-                }
-
-                const maxSpd = this.isBoosting ? this.carPreset.maxSpeed * 1.55 : this.carPreset.maxSpeed;
-                const accelRate = this.isBoosting ? this.carPreset.accel * 1.8 : this.carPreset.accel;
-
+                // Acceleration & Braking
                 if (this.keys.up) {
-                    this.car.speed = Math.min(this.car.speed + accelRate, maxSpd);
+                    this.car.speed = Math.min(this.car.speed + this.car.accel, this.car.maxSpeed);
                 } else if (this.keys.down) {
-                    this.car.speed = Math.max(this.car.speed - accelRate * 0.8, -maxSpd * 0.4);
+                    this.car.speed = Math.max(this.car.speed - this.car.accel * 0.8, -this.car.maxSpeed * 0.4);
                 } else {
-                    this.car.speed *= this.carPreset.friction;
+                    this.car.speed *= this.car.friction;
                 }
 
-                const steerFactor = this.keys.drift ? this.carPreset.driftFactor * 1.4 : this.carPreset.driftFactor;
+                // Dynamic Steering with Drift
+                const steerMultiplier = this.keys.drift ? 0.055 : 0.038;
                 if (this.keys.left && Math.abs(this.car.speed) > 0.01) {
-                    this.car.heading += (this.car.speed > 0 ? 1 : -1) * steerFactor;
+                    this.car.heading += (this.car.speed > 0 ? 1 : -1) * steerMultiplier;
+                    this.car.steerAngle = Math.min(this.car.steerAngle + 0.08, 0.45);
                     if (this.keys.drift) this.spawnDriftSmoke(this.car.pos.x, this.car.pos.z);
-                }
-                if (this.keys.right && Math.abs(this.car.speed) > 0.01) {
-                    this.car.heading -= (this.car.speed > 0 ? 1 : -1) * steerFactor;
+                } else if (this.keys.right && Math.abs(this.car.speed) > 0.01) {
+                    this.car.heading -= (this.car.speed > 0 ? 1 : -1) * steerMultiplier;
+                    this.car.steerAngle = Math.max(this.car.steerAngle - 0.08, -0.45);
                     if (this.keys.drift) this.spawnDriftSmoke(this.car.pos.x, this.car.pos.z);
+                } else {
+                    this.car.steerAngle *= 0.85;
                 }
 
+                // Position update
                 this.car.pos.x -= Math.sin(this.car.heading) * this.car.speed;
                 this.car.pos.z -= Math.cos(this.car.heading) * this.car.speed;
 
-                this.car.pos.x = Math.max(Math.min(this.car.pos.x, 50), -50);
-                this.car.pos.z = Math.max(Math.min(this.car.pos.z, 80), -135);
+                // Boundary bounds collision with bounce
+                if (this.car.pos.x < -50) { this.car.pos.x = -50; this.car.speed *= -0.3; }
+                if (this.car.pos.x > 50) { this.car.pos.x = 50; this.car.speed *= -0.3; }
+                if (this.car.pos.z > 70) { this.car.pos.z = 70; this.car.speed *= -0.3; }
+                if (this.car.pos.z < -135) { this.car.pos.z = -135; this.car.speed *= -0.3; }
 
+                // Pyramid Smash detection
                 if (!this.pyramidShattered && Math.abs(this.car.pos.z) < 12 && Math.abs(this.car.pos.x) < 14) {
                     if (Math.abs(this.car.speed) > 0.25) {
                         this.triggerPyramidShatter();
@@ -1178,63 +1050,51 @@
                     }
                 }
 
+                // Suspension Tilt (Pitch & Roll)
+                const pitch = -this.car.speed * 0.08;
+                const roll = -this.car.steerAngle * (this.car.speed / this.car.maxSpeed) * 0.12;
+                if (this.car.chassis) {
+                    this.car.chassis.rotation.x = pitch;
+                    this.car.chassis.rotation.z = roll;
+                }
+
+                // Wheels Rotation & Steering
+                this.car.frontWheels.forEach(fw => {
+                    fw.holder.rotation.y = this.car.steerAngle;
+                    fw.wheel.rotation.x += this.car.speed * 1.5;
+                });
+                this.car.rearWheels.forEach(rw => {
+                    rw.rotation.x += this.car.speed * 1.5;
+                });
+
                 this.car.mesh.position.copy(this.car.pos);
                 this.car.mesh.rotation.y = this.car.heading;
 
-                const camDist = 12;
-                const camHeight = 5.5;
-                const targetCamX = this.car.pos.x + Math.sin(this.car.heading) * camDist;
-                const targetCamZ = this.car.pos.z + Math.cos(this.car.heading) * camDist;
-                
-                this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
-                this.camera.position.y += (this.car.pos.y + camHeight - this.camera.position.y) * 0.1;
-                this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
-                this.camera.lookAt(this.car.pos.x, this.car.pos.y + 1.2, this.car.pos.z);
+                // Camera follow modes
+                if (this.camMode === "chase") {
+                    const camDist = 12;
+                    const camHeight = 5.5;
+                    const targetCamX = this.car.pos.x + Math.sin(this.car.heading) * camDist;
+                    const targetCamZ = this.car.pos.z + Math.cos(this.car.heading) * camDist;
+                    
+                    this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
+                    this.camera.position.y += (this.car.pos.y + camHeight - this.camera.position.y) * 0.1;
+                    this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
+                    this.camera.lookAt(this.car.pos.x, this.car.pos.y + 1.2, this.car.pos.z);
+                } else {
+                    // Top-Down Overview Mode
+                    this.camera.position.set(this.car.pos.x, 38, this.car.pos.z + 10);
+                    this.camera.lookAt(this.car.pos.x, 0, this.car.pos.z);
+                }
 
+                // Speedometer HUD
                 const kmh = Math.round(Math.abs(this.car.speed) * 160);
                 this.speedometerVal.textContent = kmh;
-                this.speedometerBar.style.width = Math.min(kmh / 1.6, 100) + "%";
-                this.nitroBar.style.width = Math.round(this.nitroRemaining) + "%";
-                this.nitroVal.textContent = Math.round(this.nitroRemaining) + "%";
-                this.gearIndicator.textContent = kmh > 110 ? "GEAR 5" : (kmh > 70 ? "GEAR 4" : (kmh > 40 ? "GEAR 3" : (kmh > 15 ? "GEAR 2" : "GEAR 1")));
+                this.speedometerBar.style.width = Math.min(kmh / 1.5, 100) + "%";
+                this.gearIndicator.textContent = kmh > 90 ? "GEAR 4" : (kmh > 50 ? "GEAR 3" : (kmh > 20 ? "GEAR 2" : "GEAR 1"));
 
                 this.updateEngineAudio();
-            }
-
-            updatePoliceAI() {
-                const now = Date.now();
-                this.policeCars.forEach((cop, idx) => {
-                    if (!cop.active) return;
-
-                    const flash = Math.sin(now * 0.015 + idx * Math.PI) > 0;
-                    cop.lightBlue.intensity = flash ? 3.0 : 0;
-                    cop.lightRed.intensity = flash ? 0 : 3.0;
-
-                    const dx = this.car.pos.x - cop.pos.x;
-                    const dz = this.car.pos.z - cop.pos.z;
-                    const targetAngle = Math.atan2(-dx, -dz);
-                    
-                    cop.heading += (targetAngle - cop.heading) * 0.04;
-                    cop.speed = Math.min(0.65 + this.wantedLevel * 0.06, cop.speed + 0.01);
-
-                    cop.pos.x -= Math.sin(cop.heading) * cop.speed;
-                    cop.pos.z -= Math.cos(cop.heading) * cop.speed;
-
-                    cop.mesh.position.copy(cop.pos);
-                    cop.mesh.rotation.y = cop.heading;
-
-                    const dist = cop.pos.distanceTo(this.car.pos);
-                    if (dist < 3.2) {
-                        this.car.speed *= 0.6;
-                    }
-                });
-
-                if (this.helicopter && this.helicopter.active) {
-                    this.helicopter.rotor.rotation.y += 0.45;
-                    this.helicopter.group.position.x += (this.car.pos.x - this.helicopter.group.position.x) * 0.02;
-                    this.helicopter.group.position.z += (this.car.pos.z - this.helicopter.group.position.z) * 0.02;
-                    this.helicopter.target.position.copy(this.car.pos);
-                }
+                this.drawRadar();
             }
 
             checkProximityTriggers() {
@@ -1271,7 +1131,6 @@
                 requestAnimationFrame(() => this.animate());
 
                 this.updateCarPhysics();
-                this.updatePoliceAI();
                 this.checkProximityTriggers();
 
                 for (let i = this.shards.length - 1; i >= 0; i--) {
@@ -1289,7 +1148,7 @@
 
                 for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
                     const p = this.smokeParticles[i];
-                    p.opacity -= 0.02;
+                    p.opacity -= 0.025;
                     p.scale += 0.04;
                     p.mesh.scale.set(p.scale, p.scale, p.scale);
                     p.mesh.material.opacity = p.opacity;
