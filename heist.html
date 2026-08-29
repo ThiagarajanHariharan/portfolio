@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🗺️ The Louvre Heist | Real Google Map 3D Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="A real-world GIS 3D getaway car portfolio through Paris and the Louvre Museum Cour Napoléon (48.8606° N, 2.3376° E).">
+    <title>🗺️ The Louvre Heist | Live Satellite Map 3D Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="An interactive 3D getaway car portfolio driven over real Paris satellite imagery and live Leaflet GPS map tracking.">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🗺️ The Louvre Heist | Real Google Map 3D Portfolio">
-    <meta property="og:description" content="Drive a getaway car across real Paris satellite map coordinates in 3D.">
+    <meta property="og:title" content="🗺️ The Louvre Heist | Live Satellite Map 3D Portfolio">
+    <meta property="og:description" content="Drive a getaway car over real Paris satellite map imagery in 3D.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
     <meta name="theme-color" content="#020617">
@@ -35,13 +35,16 @@
                         heistRed: "#ef4444",
                         heistCyan: "#06b6d4",
                         gmapGreen: "#34a853",
-                        gmapBlue: "#4285f4",
-                        gmapYellow: "#fbbc05"
+                        gmapBlue: "#4285f4"
                     }
                 }
             }
         }
     </script>
+
+    <!-- Leaflet.js (Live Real Satellite Map Engine) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -71,15 +74,35 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
+        #leaflet-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 14px;
+        }
+        .leaflet-container {
+            background: #0b1120 !important;
+            font-family: inherit;
+        }
+        .leaflet-control-attribution {
+            display: none !important;
+        }
+        .car-map-marker {
+            width: 14px;
+            height: 14px;
+            background: #00f2ff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #00f2ff;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-white font-sans select-none relative overflow-hidden">
 
     <!-- 3D Game Canvas Viewport -->
     <div id="game-container" class="w-full h-full absolute inset-0"></div>
-    <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-25"></div>
+    <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-20"></div>
 
-    <!-- Top GPS Navigation & Objective HUD -->
+    <!-- Top GPS Navigation & Status HUD -->
     <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         
         <!-- Live GPS & Location Badge -->
@@ -90,7 +113,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> GPS LIVE
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> REAL SATELLITE GPS
                     </span>
                     <span class="text-[10px] font-mono text-slate-400" id="gps-coords-hud">48.860611° N, 2.337644° E</span>
                 </div>
@@ -100,7 +123,7 @@
             </div>
         </div>
 
-        <!-- Google Maps Satellite Radar, Camera & Exit -->
+        <!-- Live Leaflet Satellite Radar & Controls -->
         <div class="flex items-center gap-3 pointer-events-auto">
             <!-- Camera Toggle Button -->
             <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg">
@@ -118,12 +141,12 @@
                 </div>
             </div>
 
-            <!-- Real Google Map Satellite Radar -->
-            <div class="glass-panel rounded-2xl p-1.5 border border-blue-500/40 shadow-2xl relative">
-                <div class="absolute -top-2 -left-2 bg-blue-600 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-md font-mono z-10 shadow">
-                    MAPS
+            <!-- LIVE REAL LEAFLET SATELLITE MAP OVERLAY -->
+            <div id="map-widget-container" class="glass-panel rounded-2xl p-1.5 border border-cyan-500/50 shadow-2xl relative w-32 h-32 md:w-44 md:h-44 transition-all duration-300 overflow-hidden">
+                <div class="absolute top-2 left-2 bg-blue-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded-md font-mono z-[500] shadow flex items-center gap-1 pointer-events-none">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE SATELLITE
                 </div>
-                <canvas id="radar-canvas" width="88" height="88" class="rounded-xl block"></canvas>
+                <div id="leaflet-map"></div>
             </div>
 
             <a href="index.html" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-medium text-xs border border-slate-700 transition-all flex items-center gap-1.5">
@@ -203,7 +226,6 @@
                 </button>
             </div>
 
-            <!-- Exhibit Image / Preview -->
             <div class="w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-slate-700 bg-slate-900 my-4 flex items-center justify-center relative shadow-inner">
                 <canvas id="modal-canvas-preview" width="640" height="360" class="w-full h-full object-cover"></canvas>
             </div>
@@ -240,7 +262,7 @@
             <div class="text-xs font-mono text-emerald-400 uppercase tracking-widest mb-1">ENCRYPTED TRANSMISSION FROM THE AGENT</div>
             <h2 class="text-3xl font-cyber font-black text-white mb-2">HEIST SUCCESSFUL. REPOSITORIES SECURED.</h2>
             <p class="text-slate-400 text-sm max-w-lg mx-auto mb-6">
-                "Outstanding driving, operative. You breached the Louvre across Paris coordinates, liberated Hariharan's engineering masterpieces, and reached the extraction tunnel. Here are your decrypted repository keys."
+                "Outstanding driving, operative. You breached the Louvre across live Paris coordinates, liberated Hariharan's engineering masterpieces, and reached the extraction tunnel. Here are your decrypted repository keys."
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left mb-6">
@@ -338,7 +360,6 @@
             }
         ];
 
-        // Paris GPS Base Datum (Cour Napoléon, Louvre)
         const GPS_BASE = {
             lat: 48.860611,
             lng: 2.337644,
@@ -360,8 +381,6 @@
                 this.gpsCoordsHud = document.getElementById("gps-coords-hud");
                 this.streetLocationHud = document.getElementById("street-location-hud");
                 this.sectorCompass = document.getElementById("sector-compass");
-                this.radarCanvas = document.getElementById("radar-canvas");
-                this.radarCtx = this.radarCanvas.getContext("2d");
                 
                 // Modals
                 this.inspectionModal = document.getElementById("inspection-modal");
@@ -415,6 +434,11 @@
                 this.shards = [];
                 this.smokeParticles = [];
                 
+                // Leaflet Map & Markers
+                this.leafletMap = null;
+                this.playerMarker = null;
+                this.exhibitMarkers = {};
+
                 // Web Audio Context
                 this.audioCtx = null;
                 this.engineGain = null;
@@ -426,7 +450,7 @@
             init() {
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x040711);
-                this.scene.fog = new THREE.FogExp2(0x040711, 0.010);
+                this.scene.fog = new THREE.FogExp2(0x040711, 0.009);
 
                 this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 350);
                 
@@ -437,8 +461,9 @@
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this.container.appendChild(this.renderer.domElement);
 
+                this.initLeafletMap();
                 this.setupLighting();
-                this.buildSatelliteGroundMesh();
+                this.buildRealSatelliteTerrain();
                 this.buildLouvrePyramid();
                 this.buildParisianPalaceWings();
                 this.buildCar();
@@ -446,6 +471,51 @@
 
                 window.addEventListener("resize", () => this.onResize());
                 this.animate();
+            }
+
+            // ----------------------------------------------------
+            // 🛰️ LEAFLET LIVE SATELLITE MAP ENGINE
+            // ----------------------------------------------------
+            initLeafletMap() {
+                try {
+                    this.leafletMap = L.map("leaflet-map", {
+                        center: [GPS_BASE.lat, GPS_BASE.lng],
+                        zoom: 17,
+                        zoomControl: false,
+                        attributionControl: false,
+                        dragging: false,
+                        touchZoom: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false
+                    });
+
+                    // Esri World Imagery Satellite Tile Layer (Real-time live tiles)
+                    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+                        maxZoom: 19
+                    }).addTo(this.leafletMap);
+
+                    // Add Exhibit Pins
+                    EXHIBITS_DATA.forEach(ex => {
+                        const marker = L.circleMarker([ex.lat, ex.lng], {
+                            radius: 5,
+                            color: "#ffffff",
+                            fillColor: "#ef4444",
+                            fillOpacity: 0.9,
+                            weight: 2
+                        }).addTo(this.leafletMap);
+                        this.exhibitMarkers[ex.id] = marker;
+                    });
+
+                    // Add Player Car GPS Live Blinking Dot
+                    const carIcon = L.divIcon({
+                        className: "car-map-marker",
+                        iconSize: [14, 14],
+                        iconAnchor: [7, 7]
+                    });
+                    this.playerMarker = L.marker([GPS_BASE.lat, GPS_BASE.lng], { icon: carIcon }).addTo(this.leafletMap);
+                } catch (e) {
+                    console.error("Leaflet init error:", e);
+                }
             }
 
             setupLighting() {
@@ -469,67 +539,25 @@
             }
 
             // ----------------------------------------------------
-            // 🛰️ REAL SATELLITE MAP TERRAIN MESH
+            // 🛰️ REAL SATELLITE TERRAIN TEXTURE MESH
             // ----------------------------------------------------
-            buildSatelliteGroundMesh() {
-                // High-Resolution Satellite Map Procedural Canvas Texture
-                const mapCanvas = document.createElement("canvas");
-                mapCanvas.width = 1024;
-                mapCanvas.height = 1024;
-                const mCtx = mapCanvas.getContext("2d");
-
-                // Satellite asphalt / cobblestone base
-                mCtx.fillStyle = "#0c1322";
-                mCtx.fillRect(0, 0, 1024, 1024);
-
-                // Paris Cour Napoléon central plaza pavers
-                mCtx.fillStyle = "#151e33";
-                mCtx.fillRect(200, 150, 624, 724);
-
-                // Reflecting Fountains around Pyramid
-                mCtx.fillStyle = "#0284c7";
-                mCtx.fillRect(360, 480, 80, 80);
-                mCtx.fillRect(584, 480, 80, 80);
-                mCtx.fillRect(472, 380, 80, 60);
-
-                // Cobblestone Grid lines
-                mCtx.strokeStyle = "rgba(56, 189, 248, 0.15)";
-                mCtx.lineWidth = 2;
-                for (let i = 200; i <= 824; i += 60) {
-                    mCtx.beginPath();
-                    mCtx.moveTo(i, 150);
-                    mCtx.lineTo(i, 874);
-                    mCtx.stroke();
-                }
-                for (let j = 150; j <= 874; j += 60) {
-                    mCtx.beginPath();
-                    mCtx.moveTo(200, j);
-                    mCtx.lineTo(824, j);
-                    mCtx.stroke();
-                }
-
-                // Satellite Cartography Stamp
-                mCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
-                mCtx.font = "bold 16px monospace";
-                mCtx.fillText("GOOGLE MAPS GIS SATELLITE // 48.8606°N 2.3376°E", 230, 850);
-                mCtx.fillText("COUR NAPOLÉON - PALAIS DU LOUVRE, PARIS", 230, 825);
-
-                const satelliteTex = new THREE.CanvasTexture(mapCanvas);
-                satelliteTex.wrapS = THREE.ClampToEdgeWrapping;
-                satelliteTex.wrapT = THREE.ClampToEdgeWrapping;
+            buildRealSatelliteTerrain() {
+                const textureLoader = new THREE.TextureLoader();
+                const satelliteTexture = textureLoader.load("louvre_satellite_real.jpg");
+                satelliteTexture.wrapS = THREE.ClampToEdgeWrapping;
+                satelliteTexture.wrapT = THREE.ClampToEdgeWrapping;
 
                 const groundGeo = new THREE.PlaneGeometry(160, 280);
                 const groundMat = new THREE.MeshStandardMaterial({
-                    map: satelliteTex,
+                    map: satelliteTexture,
                     roughness: 0.35,
-                    metalness: 0.4
+                    metalness: 0.25
                 });
                 const ground = new THREE.Mesh(groundGeo, groundMat);
                 ground.rotation.x = -Math.PI / 2;
                 ground.receiveShadow = true;
                 this.scene.add(ground);
 
-                // Perimeter Walls
                 const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
                 const backWall = new THREE.Mesh(new THREE.BoxGeometry(160, 16, 4), wallMat);
                 backWall.position.set(0, 8, 85);
@@ -543,7 +571,6 @@
                 rightWall.position.set(60, 8, -10);
                 this.scene.add(rightWall);
 
-                // Streetlamps
                 for (let z of [25, 60]) {
                     for (let x of [-35, 35]) {
                         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 10), wallMat);
@@ -734,8 +761,8 @@
                     const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
                     wheel.rotation.z = Math.PI / 2;
                     wheel.castShadow = true;
-                    wheelGroup: this.carGroup.add(wheel);
                     wheel.position.set(x, y, z);
+                    this.carGroup.add(wheel);
                     this.car.rearWheels.push(wheel);
                 });
 
@@ -1006,90 +1033,34 @@
                     wireframe: true
                 });
 
+                // Update Leaflet marker color to green
+                if (this.exhibitMarkers[this.activeExhibit.id]) {
+                    this.exhibitMarkers[this.activeExhibit.id].setStyle({ fillColor: "#10b981", color: "#10b981" });
+                }
+
                 this.stolenCountEl.textContent = this.stolenExhibits.size;
                 this.closeInspectionModal();
             }
 
             // ----------------------------------------------------
-            // 🗺️ GOOGLE MAPS GIS SATELLITE RADAR
-            // ----------------------------------------------------
-            drawRadar() {
-                const ctx = this.radarCtx;
-                const w = this.radarCanvas.width;
-                const h = this.radarCanvas.height;
-
-                ctx.clearRect(0, 0, w, h);
-
-                // Satellite Dark Tile Base
-                ctx.fillStyle = "#0c1322";
-                ctx.fillRect(0, 0, w, h);
-
-                // Courtyard Plaza in Map
-                ctx.fillStyle = "#1e293b";
-                ctx.fillRect(14, 10, 60, 68);
-
-                // Grid Lines
-                ctx.strokeStyle = "rgba(66, 133, 244, 0.25)";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(w / 2, h / 2, 38, 0, Math.PI * 2);
-                ctx.arc(w / 2, h / 2, 22, 0, Math.PI * 2);
-                ctx.stroke();
-
-                const mapX = (x) => ((x + 60) / 120) * (w - 16) + 8;
-                const mapZ = (z) => ((z + 135) / 210) * (h - 16) + 8;
-
-                // Exhibits (Google Maps Pin Style)
-                EXHIBITS_DATA.forEach(ex => {
-                    const exX = mapX(ex.pos.x);
-                    const exZ = mapZ(ex.pos.z);
-                    ctx.fillStyle = ex.stolen ? "#34a853" : "#ea4335";
-                    ctx.beginPath();
-                    ctx.arc(exX, exZ, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#ffffff";
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                });
-
-                // Safehouse Exit Marker
-                ctx.fillStyle = "#34a853";
-                ctx.fillRect(mapX(0) - 5, mapZ(-130) - 2, 10, 4);
-
-                // Player Car Marker
-                const playerX = mapX(this.car.pos.x);
-                const playerZ = mapZ(this.car.pos.z);
-
-                ctx.save();
-                ctx.translate(playerX, playerZ);
-                ctx.rotate(this.car.heading + Math.PI);
-                ctx.fillStyle = "#4285f4";
-                ctx.beginPath();
-                ctx.moveTo(0, -6);
-                ctx.lineTo(-4, 5);
-                ctx.lineTo(4, 5);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = "#ffffff";
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.restore();
-            }
-
-            // ----------------------------------------------------
-            // 📍 REAL WGS84 GPS COORDINATE TELEMETRY
+            // 📍 REAL WGS84 GPS COORDINATE TELEMETRY & MAP SYNC
             // ----------------------------------------------------
             updateGPSTelemetry() {
-                // Approximate 1 Three.js unit = 1.8 meters
                 const deltaLat = (-this.car.pos.z * 1.8) / GPS_BASE.metersPerDegLat;
                 const deltaLng = (this.car.pos.x * 1.8) / GPS_BASE.metersPerDegLng;
 
-                const currentLat = (GPS_BASE.lat + deltaLat).toFixed(6);
-                const currentLng = (GPS_BASE.lng + deltaLng).toFixed(6);
+                const currentLat = GPS_BASE.lat + deltaLat;
+                const currentLng = GPS_BASE.lng + deltaLng;
 
-                this.gpsCoordsHud.textContent = currentLat + "° N, " + currentLng + "° E";
+                this.gpsCoordsHud.textContent = currentLat.toFixed(6) + "° N, " + currentLng.toFixed(6) + "° E";
 
-                // Determine Parisian Street Sector
+                // Sync Leaflet Map Marker and Viewport
+                if (this.leafletMap && this.playerMarker) {
+                    const latlng = [currentLat, currentLng];
+                    this.playerMarker.setLatLng(latlng);
+                    this.leafletMap.panTo(latlng, { animate: false });
+                }
+
                 if (this.car.pos.z < -90) {
                     this.streetLocationHud.textContent = "📍 JARDIN DES TUILERIES // SAFEHOUSE GATE";
                 } else if (this.car.pos.z < -30) {
@@ -1187,7 +1158,6 @@
 
                 this.updateEngineAudio();
                 this.updateGPSTelemetry();
-                this.drawRadar();
             }
 
             checkProximityTriggers() {
@@ -1264,6 +1234,9 @@
                 this.camera.aspect = window.innerWidth / window.innerHeight;
                 this.camera.updateProjectionMatrix();
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
+                if (this.leafletMap) {
+                    this.leafletMap.invalidateSize();
+                }
             }
         }
 
