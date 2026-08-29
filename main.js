@@ -15,6 +15,7 @@ class ContributionBlaster {
         this.soundBtn = document.getElementById('sound-toggle-btn');
         this.clearBtn = document.getElementById('clear-grid-btn');
         this.nukeBtn = document.getElementById('nuke-strike-btn');
+        this.bossBtn = document.getElementById('boss-fight-btn');
         this.tooltipEl = document.getElementById('blaster-tooltip');
 
         if (!this.container || !this.gridEl || !this.canvas || !this.gunSvg) return;
@@ -26,10 +27,17 @@ class ContributionBlaster {
         this.MAX_FLOATING_TEXTS = 30;
         this.projectiles = [];
         this.missiles = [];
+        this.bossProjectiles = [];
         this.particles = [];
         this.shockwaves = [];
         this.floatingTexts = [];
         this.targetLocks = [];
+
+        // 👾 BOSS BATTLE: Overlord Procrastinus Engine
+        this.boss = null;
+        this.bossActive = false;
+        this.konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        this.konamiIndex = 0;
 
         this.score = 0;
         this.streak = 0;
@@ -237,6 +245,70 @@ class ContributionBlaster {
             gain.connect(this.audioCtx.destination);
             osc.start();
             osc.stop(this.audioCtx.currentTime + 0.15);
+        } catch (e) {}
+    }
+
+    playBossAlarmSound() {
+        if (!this.soundEnabled) return;
+        this.ensureAudioContext();
+        if (!this.audioCtx) return;
+        try {
+            for (let i = 0; i < 3; i++) {
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.type = 'sawtooth';
+                const startTime = this.audioCtx.currentTime + i * 0.22;
+                osc.frequency.setValueAtTime(440, startTime);
+                osc.frequency.linearRampToValueAtTime(880, startTime + 0.1);
+                osc.frequency.linearRampToValueAtTime(330, startTime + 0.2);
+                gain.gain.setValueAtTime(0.25, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2);
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+                osc.start(startTime);
+                osc.stop(startTime + 0.2);
+            }
+        } catch (e) {}
+    }
+
+    playBossHitSound() {
+        if (!this.soundEnabled) return;
+        this.ensureAudioContext();
+        if (!this.audioCtx) return;
+        try {
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(320, this.audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, this.audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+            osc.start();
+            osc.stop(this.audioCtx.currentTime + 0.08);
+        } catch (e) {}
+    }
+
+    playVictorySound() {
+        if (!this.soundEnabled) return;
+        this.ensureAudioContext();
+        if (!this.audioCtx) return;
+        try {
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+            notes.forEach((freq, i) => {
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.type = 'triangle';
+                const st = this.audioCtx.currentTime + i * 0.1;
+                osc.frequency.setValueAtTime(freq, st);
+                gain.gain.setValueAtTime(0.2, st);
+                gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+                osc.start(st);
+                osc.stop(st + 0.35);
+            });
         } catch (e) {}
     }
 
@@ -462,9 +534,34 @@ class ContributionBlaster {
             });
         }
 
+        if (this.bossBtn) {
+            this.bossBtn.addEventListener('click', () => {
+                this.ensureAudioContext();
+                this.startBossBattle();
+            });
+        }
+
+        // 🎮 KONAMI CODE EASTER EGG (↑ ↑ ↓ ↓ ← → ← → B A)
+        window.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key === this.konamiCode[this.konamiIndex] || key.toLowerCase() === this.konamiCode[this.konamiIndex]) {
+                this.konamiIndex++;
+                if (this.konamiIndex === this.konamiCode.length) {
+                    this.konamiIndex = 0;
+                    this.ensureAudioContext();
+                    this.startBossBattle();
+                }
+            } else {
+                this.konamiIndex = 0;
+            }
+        });
+
         if (this.clearBtn) {
             this.clearBtn.addEventListener('click', () => {
                 if (this.replayActive) this.toggleTimelineReplay();
+                this.boss = null;
+                this.bossActive = false;
+                this.bossProjectiles = [];
                 this.cells.forEach(cell => {
                     const orig = parseInt(cell.dataset.originalLevel || '0');
                     this.applyCellLevel(cell, orig);
@@ -477,6 +574,88 @@ class ContributionBlaster {
                 }
             });
         }
+    }
+
+    // 👾 BOSS BATTLE: Overlord Procrastinus Spawner
+    startBossBattle() {
+        if (this.bossActive) return;
+        this.bossActive = true;
+        this.playBossAlarmSound();
+
+        const canvasWidth = this.canvas.width / this.dpr;
+        
+        this.boss = {
+            x: canvasWidth / 2,
+            y: -70,
+            targetY: 60,
+            width: 160,
+            height: 60,
+            hp: 1000,
+            maxHp: 1000,
+            vx: 2.5,
+            phase: 1,
+            lastShot: Date.now(),
+            state: 'entering'
+        };
+
+        if (this.totalCommitsEl) {
+            this.totalCommitsEl.textContent = `👾 OVERLORD PROCRASTINUS [1000/1000 HP]`;
+        }
+
+        this.floatingTexts.push({
+            x: canvasWidth / 2 - 120,
+            y: 110,
+            text: '🚨 WARNING: OVERLORD PROCRASTINUS DETECTED! 🚨',
+            alpha: 1,
+            vy: -0.4,
+            color: '#f43f5e'
+        });
+
+        this.container.classList.add('shake-active');
+        setTimeout(() => this.container.classList.remove('shake-active'), 500);
+    }
+
+    defeatBoss() {
+        if (!this.boss) return;
+        this.boss.state = 'exploding';
+        this.playVictorySound();
+
+        const bx = this.boss.x;
+        const by = this.boss.y;
+
+        // Massive victory explosions across the boss hull
+        for (let i = 0; i < 16; i++) {
+            setTimeout(() => {
+                const ex = bx + (Math.random() * 140 - 70);
+                const ey = by + (Math.random() * 50 - 25);
+                this.triggerNukeDetonation(ex, ey, null, 100, 'PROCRASTINATION CRUSHED');
+            }, i * 120);
+        }
+
+        setTimeout(() => {
+            this.boss = null;
+            this.bossActive = false;
+            this.bossProjectiles = [];
+            this.score += 10000;
+            this.streak += 50;
+            this.updateStats();
+
+            // Turn all heatmap tiles radioactive green in celebration
+            this.cells.forEach(c => this.applyCellLevel(c, 4));
+
+            if (this.totalCommitsEl) {
+                this.totalCommitsEl.textContent = `🏆 OVERLORD PROCRASTINUS DEFEATED! +10,000 EXP!`;
+            }
+
+            this.floatingTexts.push({
+                x: (this.canvas.width / this.dpr) / 2 - 150,
+                y: 90,
+                text: '🏆 100% DISCIPLINE ACHIEVED! +10,000 XP! 🏆',
+                alpha: 1,
+                vy: -0.6,
+                color: '#facc15'
+            });
+        }, 2200);
     }
 
     toggleTimelineReplay() {
@@ -781,6 +960,177 @@ class ContributionBlaster {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // 👾 0. Update & Draw Boss (Overlord Procrastinus)
+        if (this.boss && this.bossActive) {
+            const b = this.boss;
+            const canvasWidth = this.canvas.width / this.dpr;
+
+            // Entrance movement
+            if (b.state === 'entering') {
+                b.y += (b.targetY - b.y) * 0.05;
+                if (Math.abs(b.y - b.targetY) < 2) {
+                    b.y = b.targetY;
+                    b.state = 'active';
+                }
+            } else if (b.state === 'active') {
+                // Lateral movement
+                b.x += b.vx;
+                if (b.x < 100 || b.x > canvasWidth - 100) {
+                    b.vx = -b.vx;
+                }
+
+                // Phase 2 Enrage
+                if (b.hp <= 500 && b.phase === 1) {
+                    b.phase = 2;
+                    b.vx = b.vx > 0 ? 3.8 : -3.8;
+                    this.floatingTexts.push({
+                        x: b.x - 60,
+                        y: b.y - 20,
+                        text: '⚡ PHASE 2: DEADLINE FRENZY! ⚡',
+                        alpha: 1,
+                        vy: -1,
+                        color: '#ef4444'
+                    });
+                }
+
+                // Boss Attack AI: Fire red laser bolts
+                const now = Date.now();
+                const shotInterval = b.phase === 2 ? 600 : 1100;
+                if (now - b.lastShot > shotInterval) {
+                    b.lastShot = now;
+                    // Left and Right Wing Cannons
+                    this.bossProjectiles.push({
+                        x: b.x - 50,
+                        y: b.y + 25,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: 4.5,
+                        radius: 4,
+                        color: '#f43f5e'
+                    });
+                    this.bossProjectiles.push({
+                        x: b.x + 50,
+                        y: b.y + 25,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: 4.5,
+                        radius: 4,
+                        color: '#f43f5e'
+                    });
+                    if (b.phase === 2) {
+                        this.bossProjectiles.push({
+                            x: b.x,
+                            y: b.y + 35,
+                            vx: 0,
+                            vy: 6,
+                            radius: 6,
+                            color: '#fbbf24'
+                        });
+                    }
+                }
+            }
+
+            // Draw Boss Dreadnought Hull
+            this.ctx.save();
+            this.ctx.translate(b.x, b.y);
+
+            // Thruster fire
+            const flameHeight = Math.random() * 16 + 10;
+            this.ctx.beginPath();
+            this.ctx.moveTo(-40, -25);
+            this.ctx.lineTo(-30, -25 - flameHeight);
+            this.ctx.lineTo(-20, -25);
+            this.ctx.fillStyle = '#38bdf8';
+            this.ctx.shadowColor = '#0284c7';
+            this.ctx.shadowBlur = 15;
+            this.ctx.fill();
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(20, -25);
+            this.ctx.lineTo(30, -25 - flameHeight);
+            this.ctx.lineTo(40, -25);
+            this.ctx.fillStyle = '#38bdf8';
+            this.ctx.fill();
+
+            // Main Wings & Armor Plates
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, 35);
+            this.ctx.lineTo(75, 10);
+            this.ctx.lineTo(85, -20);
+            this.ctx.lineTo(35, -25);
+            this.ctx.lineTo(0, -15);
+            this.ctx.lineTo(-35, -25);
+            this.ctx.lineTo(-85, -20);
+            this.ctx.lineTo(-75, 10);
+            this.ctx.closePath();
+            this.ctx.fillStyle = b.phase === 2 ? '#450a0a' : '#0f172a';
+            this.ctx.strokeStyle = b.phase === 2 ? '#ef4444' : '#06b6d4';
+            this.ctx.lineWidth = 2.5;
+            this.ctx.shadowColor = b.phase === 2 ? '#ef4444' : '#06b6d4';
+            this.ctx.shadowBlur = 12;
+            this.ctx.fill();
+            this.ctx.stroke();
+
+            // Glowing Cyber Core
+            this.ctx.beginPath();
+            this.ctx.arc(0, 5, 12, 0, Math.PI * 2);
+            this.ctx.fillStyle = b.phase === 2 ? '#f43f5e' : '#38bdf8';
+            this.ctx.shadowColor = b.phase === 2 ? '#f43f5e' : '#38bdf8';
+            this.ctx.shadowBlur = 20;
+            this.ctx.fill();
+
+            // Scanning Eye Cyclops Visor
+            const eyeOffset = Math.sin(Date.now() * 0.006) * 18;
+            this.ctx.beginPath();
+            this.ctx.arc(eyeOffset, -5, 3.5, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fill();
+
+            this.ctx.restore();
+
+            // Draw Boss Health Bar Overlay
+            const barW = 160;
+            const barH = 8;
+            const barX = b.x - barW / 2;
+            const barY = b.y - 45;
+            const hpRatio = Math.max(b.hp / b.maxHp, 0);
+
+            this.ctx.save();
+            this.ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            this.ctx.strokeStyle = '#334155';
+            this.ctx.lineWidth = 1;
+            this.ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
+            this.ctx.strokeRect(barX - 2, barY - 2, barW + 4, barH + 4);
+
+            this.ctx.fillStyle = b.phase === 2 ? '#ef4444' : '#22c55e';
+            this.ctx.fillRect(barX, barY, barW * hpRatio, barH);
+
+            this.ctx.font = 'bold 9px monospace';
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(`OVERLORD PROCRASTINUS [${b.hp}/${b.maxHp} HP]`, b.x, barY - 6);
+            this.ctx.restore();
+        }
+
+        // 👾 0.1 Update & Draw Boss Projectiles
+        for (let i = this.bossProjectiles.length - 1; i >= 0; i--) {
+            const bp = this.bossProjectiles[i];
+            bp.x += bp.vx;
+            bp.y += bp.vy;
+
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(bp.x, bp.y, bp.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = bp.color;
+            this.ctx.shadowColor = bp.color;
+            this.ctx.shadowBlur = 10;
+            this.ctx.fill();
+            this.ctx.restore();
+
+            // Destroy at bottom
+            if (bp.y > this.canvas.height / this.dpr || bp.x < 0 || bp.x > this.canvas.width / this.dpr) {
+                this.bossProjectiles.splice(i, 1);
+            }
+        }
+
         // 1. Draw Target Lock-On Markers [ X ]
         for (let i = 0; i < this.targetLocks.length; i++) {
             const lock = this.targetLocks[i];
@@ -808,8 +1158,12 @@ class ContributionBlaster {
             const m = this.missiles[i];
             m.progress += m.speed;
 
-            const currentX = m.startX + (m.targetX - m.startX) * m.progress;
-            const linearY = m.startY + (m.targetY - m.startY) * m.progress;
+            // Retarget homing missiles towards Boss if Boss is active!
+            const targetX = (this.boss && this.bossActive) ? this.boss.x : m.targetX;
+            const targetY = (this.boss && this.bossActive) ? this.boss.y : m.targetY;
+
+            const currentX = m.startX + (targetX - m.startX) * m.progress;
+            const linearY = m.startY + (targetY - m.startY) * m.progress;
             const arcOffset = Math.sin(m.progress * Math.PI) * m.arcHeight;
             m.x = currentX;
             m.y = linearY - arcOffset;
@@ -849,8 +1203,27 @@ class ContributionBlaster {
             }
 
             if (m.progress >= 1) {
-                this.triggerNukeDetonation(m.targetX, m.targetY, m.cell, m.count, m.date);
+                this.triggerNukeDetonation(m.x, m.y, m.cell, m.count, m.date);
                 this.targetLocks = this.targetLocks.filter(l => l.cell !== m.cell);
+
+                if (this.boss && this.bossActive) {
+                    this.boss.hp = Math.max(0, this.boss.hp - 200);
+                    this.floatingTexts.push({
+                        x: this.boss.x + (Math.random() * 40 - 20),
+                        y: this.boss.y - 30,
+                        text: '-200 NUKE CRIT! 💥',
+                        alpha: 1,
+                        vy: -2,
+                        color: '#ef4444'
+                    });
+                    if (this.totalCommitsEl) {
+                        this.totalCommitsEl.textContent = `👾 OVERLORD PROCRASTINUS [${this.boss.hp}/${this.boss.maxHp} HP]`;
+                    }
+                    if (this.boss.hp <= 0) {
+                        this.defeatBoss();
+                    }
+                }
+
                 this.missiles.splice(i, 1);
             }
         }
@@ -881,6 +1254,40 @@ class ContributionBlaster {
             this.ctx.fill();
             this.ctx.shadowBlur = 0;
 
+            // 🎯 Boss Collision Detection
+            if (this.boss && this.bossActive && this.boss.state !== 'exploding') {
+                const distToBoss = Math.hypot(p.x - this.boss.x, p.y - this.boss.y);
+                if (distToBoss < 65) {
+                    this.boss.hp = Math.max(0, this.boss.hp - 25);
+                    this.score += 250;
+                    this.streak += 1;
+                    this.updateStats();
+                    this.playBossHitSound();
+
+                    this.spawnImpact(p.x, p.y, false);
+
+                    this.floatingTexts.push({
+                        x: p.x + (Math.random() * 20 - 10),
+                        y: p.y - 15,
+                        text: '-25 HP ⚡',
+                        alpha: 1,
+                        vy: -1.8,
+                        color: '#38bdf8'
+                    });
+
+                    if (this.totalCommitsEl) {
+                        this.totalCommitsEl.textContent = `👾 OVERLORD PROCRASTINUS [${this.boss.hp}/${this.boss.maxHp} HP]`;
+                    }
+
+                    if (this.boss.hp <= 0) {
+                        this.defeatBoss();
+                    }
+
+                    this.projectiles.splice(i, 1);
+                    continue;
+                }
+            }
+
             const distToTarget = Math.hypot(p.x - p.targetX, p.y - p.targetY);
             
             if (distToTarget < 15 || p.y <= p.targetY) {
@@ -890,7 +1297,7 @@ class ContributionBlaster {
                     this.spawnImpact(p.targetX, p.targetY, false);
                 }
                 this.projectiles.splice(i, 1);
-            } else if (p.y < 0 || p.x < 0 || p.x > this.canvas.width || p.y > this.canvas.height) {
+            } else if (p.y < 0 || p.x < 0 || p.x > this.canvas.width / this.dpr || p.y > this.canvas.height / this.dpr) {
                 this.projectiles.splice(i, 1);
             }
         }
