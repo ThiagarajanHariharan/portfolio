@@ -135,349 +135,278 @@
     <!-- Projects Section -->
     <section id="projects" class="py-20 bg-slate-900">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-white mb-2">Featured Projects</h2>
-            <div class="w-20 h-1 bg-primary mb-12 rounded-full"></div>
-
-            <div class="space-y-24">
-                
-                <!-- Project 1: Local AI -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div class="order-2 lg:order-1 relative rounded-2xl overflow-hidden border border-slate-700 bg-card h-[400px] flex items-center justify-center shadow-xl" id="local-ai-animation">
-                        <video class="w-full h-full object-cover" autoplay loop muted playsinline>
-                            <source src="local_ai_pipeline.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="order-1 lg:order-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/70 border border-purple-800 text-xs font-semibold text-purple-300 mb-3">
-                            EDGE COMPUTING & VLM
-                        </div>
-                        <h3 class="text-3xl font-bold text-white mb-3">M1 Edge Local AI Video Pipeline</h3>
-                        <p class="text-slate-400 mb-6 leading-relaxed">
-                            A completely local, fully private multi-modal AI pipeline designed to process a 90-minute technical meeting recording on an M1 MacBook (16GB RAM) without sending sensitive data to the cloud.
-                        </p>
-                        
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Video Duration</div>
-                                <div class="text-sm font-bold text-white">90 Mins</div>
-                            </div>
-                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Frames Ingested</div>
-                                <div class="text-sm font-bold text-purple-400">535 Frames</div>
-                            </div>
-                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">GPU Workload</div>
-                                <div class="text-sm font-bold text-emerald-400">11h @ 100%</div>
-                            </div>
-                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Thermal Profile</div>
-                                <div class="text-sm font-bold text-cyan-400">71°C Stable</div>
-                            </div>
-                        </div>
-
-                        <ul class="space-y-3 text-slate-300 text-sm mb-6">
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Vision OCR:</strong> Qwen2.5-VL (7B) via Ollama decoding dense Cisco Packet Tracer topologies and slides.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Speech Recognition:</strong> OpenAI Whisper (Small) via PyTorch generating timestamped audio transcripts.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Automated Synthesis:</strong> Merges OCR text & speech timestamps into unified, searchable Markdown meeting dossiers.</span>
-                            </li>
-                        </ul>
-                    </div>
+            <div class="flex flex-wrap items-end justify-between gap-4 mb-12">
+                <div>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2">Featured Projects & Test Scenarios</h2>
+                    <div class="w-20 h-1 bg-primary rounded-full"></div>
                 </div>
+                <div class="text-xs font-mono text-emerald-400 bg-slate-800/90 px-3.5 py-1.5 rounded-full border border-slate-700 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ALL 5 PROJECTS CI/CD TESTED
+                </div>
+            </div>
 
-                <!-- Project 2: Campus Found -->
+            <div class="space-y-28">
+                
+                <!-- Project 1: Campus Found -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="relative rounded-2xl overflow-hidden border border-slate-700 bg-card shadow-2xl group">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700 text-xs font-mono">
+                            <span class="text-sky-400 font-bold">Campus Found — AWS Multi-AZ EKS</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMedia('cf', 'video')" id="cf-btn-video" class="px-2.5 py-1 rounded-md bg-blue-600 text-white font-bold transition-all text-xs">🎬 Test Scenario</button>
+                                <button onclick="toggleMedia('cf', 'img')" id="cf-btn-img" class="px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 hover:text-white transition-all text-xs">📸 Screenshot</button>
+                            </div>
+                        </div>
+                        <div class="h-[360px] w-full bg-slate-950 flex items-center justify-center relative">
+                            <video id="cf-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="assets/videos/campus_found_demo.mp4" type="video/mp4">
+                            </video>
+                            <img id="cf-img" src="assets/projects/campus_found_preview.png" alt="Campus Found Dashboard" class="w-full h-full object-cover hidden">
+                        </div>
+                    </div>
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-800 text-xs font-semibold text-blue-300 mb-3">
                             CLOUD INFRASTRUCTURE & IAC
                         </div>
                         <h3 class="text-3xl font-bold text-white mb-3">Campus Found</h3>
                         <p class="text-slate-400 mb-6 leading-relaxed">
-                            A full-stack containerized campus lost-and-found platform deployed to AWS EKS with automated multi-AZ infrastructure, relational database clustering, and Gemini AI custody matching.
+                            A containerized campus lost-and-found platform deployed to AWS EKS with automated multi-AZ infrastructure, relational database clustering, and Gemini AI custody matching.
                         </p>
                         
-                        <ul class="space-y-3 text-slate-300 text-sm mb-8">
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Multi-AZ VPC Architecture:</strong> Custom subnets, Route Tables, Internet Gateways, and NAT Gateways.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>High Availability & Traffic Routing:</strong> Application Load Balancer (ALB) with health check target groups.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Security & Secrets:</strong> TLS-only Amazon S3 bucket policies, RDS PostgreSQL isolation, and AWS Secrets Manager.</span>
-                            </li>
-                        </ul>
-
-                        <div class="flex flex-wrap gap-2 mb-8">
-                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs border border-slate-700">AWS EKS</span>
-                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs border border-slate-700">Multi-AZ VPC</span>
-                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs border border-slate-700">RDS PostgreSQL</span>
-                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs border border-slate-700">Terraform</span>
-                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs border border-slate-700">Gemini AI</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Architecture</div>
+                                <div class="text-sm font-bold text-sky-400">Multi-AZ EKS</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Provisioning</div>
+                                <div class="text-sm font-bold text-emerald-400">Terraform IaC</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Database</div>
+                                <div class="text-sm font-bold text-purple-400">RDS Postgres</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">AI Custody</div>
+                                <div class="text-sm font-bold text-white">Gemini Vision</div>
+                            </div>
                         </div>
+
                         <div class="flex gap-4">
                             <a href="https://showcaseawscapability.netlify.app/" target="_blank" rel="noopener noreferrer" class="text-white bg-primary hover:bg-blue-600 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-blue-500/20">Interactive Showcase</a>
-                            <a href="https://github.com/ThiagarajanHariharan/campus-found" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors text-sm border border-slate-700">Source Code</a>
+                            <a href="https://github.com/ThiagarajanHariharan/campus-found" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors text-sm border border-slate-700">Source Code ↗</a>
                         </div>
-                    </div>
-                    <div class="relative rounded-2xl overflow-hidden border border-slate-700 bg-card h-[400px] flex items-center justify-center shadow-xl" id="campus-found-animation">
-                        <video class="w-full h-full object-cover" autoplay loop muted playsinline>
-                            <source src="campus_found_arch.mp4" type="video/mp4">
-                        </video>
                     </div>
                 </div>
 
-                <!-- Project 3: Quartermaster -->
+                <!-- Project 2: Quartermaster -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div class="order-2 lg:order-1 relative rounded-2xl overflow-hidden border border-slate-700 bg-card h-[400px] flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950/40 shadow-2xl">
-                        <div class="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/10">
-                            <span class="text-4xl">🛡️</span>
+                    <div class="order-1 lg:order-2 relative rounded-2xl overflow-hidden border border-slate-700 bg-card shadow-2xl group">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700 text-xs font-mono">
+                            <span class="text-emerald-400 font-bold">Quartermaster — On-Device Kinematics</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMedia('qm', 'video')" id="qm-btn-video" class="px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold transition-all text-xs">🎬 Test Scenario</button>
+                                <button onclick="toggleMedia('qm', 'img')" id="qm-btn-img" class="px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 hover:text-white transition-all text-xs">📸 Screenshot</button>
+                            </div>
                         </div>
-                        <div class="font-mono text-emerald-400 text-lg font-bold tracking-widest uppercase mb-1">QUARTERMASTER</div>
-                        <div class="text-xs text-slate-400 mb-6">MILITARY ACCOUNTABILITY & POSE KINEMATICS</div>
-                        <div class="flex flex-wrap justify-center gap-2 max-w-sm">
-                            <span class="px-2.5 py-1 bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs font-mono rounded">320 Tests (100% Pass)</span>
-                            <span class="px-2.5 py-1 bg-cyan-950/80 border border-cyan-800 text-cyan-300 text-xs font-mono rounded">ML Kit 100% Offline</span>
-                            <span class="px-2.5 py-1 bg-purple-950/80 border border-purple-800 text-purple-300 text-xs font-mono rounded">fllama Edge LLM</span>
-                            <span class="px-2.5 py-1 bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono rounded">P2P Mesh Bonjour</span>
+                        <div class="h-[360px] w-full bg-slate-950 flex items-center justify-center relative">
+                            <video id="qm-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="assets/videos/quartermaster_demo.mp4" type="video/mp4">
+                            </video>
+                            <img id="qm-img" src="assets/projects/quartermaster_preview.png" alt="Quartermaster HUD" class="w-full h-full object-cover hidden">
                         </div>
                     </div>
-                    <div class="order-1 lg:order-2">
+                    <div class="order-2 lg:order-1">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800 text-xs font-semibold text-emerald-300 mb-3">
                             MOBILE & ON-DEVICE COMPUTER VISION
                         </div>
-                        <h3 class="text-3xl font-bold text-white mb-3">Quartermaster — Military Accountability Engine</h3>
+                        <h3 class="text-3xl font-bold text-white mb-3">Quartermaster — Tactical Accountability Engine</h3>
                         <p class="text-slate-400 mb-6 leading-relaxed">
                             A Flutter-based on-device fitness accountability system that enforces strict physical discipline through real-time kinematics, local LLM audio coaching, and zero-cloud P2P squad synchronization.
                         </p>
                         
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                             <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Test Suites</div>
-                                <div class="text-sm font-bold text-emerald-400">320 (100% Pass)</div>
+                                <div class="text-xs text-slate-400">Unit Tests</div>
+                                <div class="text-sm font-bold text-emerald-400">320 Passing</div>
                             </div>
                             <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Cloud Reliance</div>
-                                <div class="text-sm font-bold text-cyan-400">0% (All Edge)</div>
+                                <div class="text-xs text-slate-400">Pose Kinematics</div>
+                                <div class="text-sm font-bold text-cyan-400">ML Kit (30 FPS)</div>
                             </div>
                             <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
                                 <div class="text-xs text-slate-400">Jitter Filter</div>
                                 <div class="text-sm font-bold text-purple-400">1-Euro Adaptive</div>
                             </div>
                             <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
-                                <div class="text-xs text-slate-400">Encryption</div>
-                                <div class="text-sm font-bold text-white">AES-GCM Vault</div>
+                                <div class="text-xs text-slate-400">Sync Mesh</div>
+                                <div class="text-sm font-bold text-white">P2P Bonjour</div>
                             </div>
                         </div>
-
-                        <ul class="space-y-3 text-slate-300 text-sm mb-6">
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>On-Device Pose Tracking:</strong> Google ML Kit with 3D joint bilateral symmetry angles and concentric velocity analysis.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Local AI Audio Coach:</strong> <code>fllama</code> offline LLM generating dynamic Drill Sergeant roasts, paired with synthesized telemetry speech.</span>
-                            </li>
-                            <li class="flex items-start gap-2.5">
-                                <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>P2P Mesh Squad Raids:</strong> Zero-cloud WebSocket synchronization over Bonjour (<code>_quartermaster._tcp</code>) for competitive squad boss battles.</span>
-                            </li>
-                        </ul>
 
                         <div class="flex gap-4">
-                            <a href="https://github.com/ThiagarajanHariharan/Quartermaster" target="_blank" rel="noopener noreferrer" class="text-white bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-emerald-500/20 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
-                                Explore Quartermaster Repo
-                            </a>
+                            <a href="https://github.com/ThiagarajanHariharan/Quartermaster" target="_blank" rel="noopener noreferrer" class="text-white bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-emerald-500/20">Source Code ↗</a>
                         </div>
                     </div>
                 </div>
 
-            </div>
-
-            <!-- Full Engineering Repositories Grid -->
-            <div class="mt-24 pt-16 border-t border-slate-800">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                <!-- Project 3: AutoVideoClipper M1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="relative rounded-2xl overflow-hidden border border-slate-700 bg-card shadow-2xl group">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700 text-xs font-mono">
+                            <span class="text-purple-400 font-bold">AutoVideoClipper — Apple Silicon M1</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMedia('avc', 'video')" id="avc-btn-video" class="px-2.5 py-1 rounded-md bg-purple-600 text-white font-bold transition-all text-xs">🎬 Test Scenario</button>
+                                <button onclick="toggleMedia('avc', 'img')" id="avc-btn-img" class="px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 hover:text-white transition-all text-xs">📸 Screenshot</button>
+                            </div>
+                        </div>
+                        <div class="h-[360px] w-full bg-slate-950 flex items-center justify-center relative">
+                            <video id="avc-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="assets/videos/autovideoclipper_demo.mp4" type="video/mp4">
+                            </video>
+                            <img id="avc-img" src="assets/projects/autovideoclipper_preview.png" alt="AutoVideoClipper Pipeline" class="w-full h-full object-cover hidden">
+                        </div>
+                    </div>
                     <div>
-                        <div class="text-primary font-semibold text-sm mb-1 uppercase tracking-wider">Engineering Portfolio</div>
-                        <h3 class="text-2xl lg:text-3xl font-bold text-white">All GitHub Repositories & Systems</h3>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/70 border border-purple-800 text-xs font-semibold text-purple-300 mb-3">
+                            EDGE COMPUTING & MULTIMODAL AI
+                        </div>
+                        <h3 class="text-3xl font-bold text-white mb-3">AutoVideoClipper (M1 Edge Pipeline)</h3>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            A completely local, zero-cloud multimodal video intelligence pipeline processing 90-minute technical recordings on local M1 hardware with 11h sustained 100% GPU performance at 71°C.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">VLM Model</div>
+                                <div class="text-sm font-bold text-purple-400">Qwen2.5-VL 7B</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Speech-to-Text</div>
+                                <div class="text-sm font-bold text-cyan-400">Whisper PyTorch</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">GPU Workload</div>
+                                <div class="text-sm font-bold text-emerald-400">11h @ 100%</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Export Speed</div>
+                                <div class="text-sm font-bold text-white">4.2x Realtime</div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <a href="https://github.com/ThiagarajanHariharan/autovideoclipper" target="_blank" rel="noopener noreferrer" class="text-white bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-purple-500/20">Source Code ↗</a>
+                        </div>
                     </div>
-                    <p class="text-slate-400 text-sm mt-2 md:mt-0">
-                        Explore microservices, mobile computer vision, security tools, and AI applications.
-                    </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Card 1: Quartermaster Mobile CV -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-950/70 text-emerald-300 border border-emerald-800/60">Mobile & CV</span>
-                                <a href="https://github.com/ThiagarajanHariharan/Quartermaster" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
+                <!-- Project 4: CampusQuest Go -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="order-1 lg:order-2 relative rounded-2xl overflow-hidden border border-slate-700 bg-card shadow-2xl group">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700 text-xs font-mono">
+                            <span class="text-amber-400 font-bold">CampusQuest Go — Microservices & Strava</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMedia('cq', 'video')" id="cq-btn-video" class="px-2.5 py-1 rounded-md bg-amber-600 text-white font-bold transition-all text-xs">🎬 Test Scenario</button>
+                                <button onclick="toggleMedia('cq', 'img')" id="cq-btn-img" class="px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 hover:text-white transition-all text-xs">📸 Screenshot</button>
                             </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Quartermaster Engine</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Military fitness accountability app with 100% offline pose kinematics, local LLM audio coaching, and zero-cloud P2P squad mesh sync. 320 tests (100% pass).
-                            </p>
                         </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Flutter</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">ML Kit</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">fllama LLM</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">WebSockets</span>
+                        <div class="h-[360px] w-full bg-slate-950 flex items-center justify-center relative">
+                            <video id="cq-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="assets/videos/campquest_demo.mp4" type="video/mp4">
+                            </video>
+                            <img id="cq-img" src="assets/projects/campquest_preview.png" alt="CampusQuest Go Dashboard" class="w-full h-full object-cover hidden">
                         </div>
                     </div>
-
-                    <!-- Card 2: AutoVideoClipper -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-purple-950/70 text-purple-300 border border-purple-800/60">AI & Vision</span>
-                                <a href="https://github.com/ThiagarajanHariharan/autovideoclipper" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">AutoVideoClipper Web UI</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                AI video segmentation dashboard. Added custom Web UI and strict JSON output validation for local LLM inference engines.
-                            </p>
+                    <div class="order-2 lg:order-1">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-800 text-xs font-semibold text-amber-300 mb-3">
+                            DEVOPS & DISTRIBUTED MICROSERVICES
                         </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Python</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Flask</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Local LLMs</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">FFmpeg</span>
+                        <h3 class="text-3xl font-bold text-white mb-3">CampusQuest Go (Questify)</h3>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            A containerized health and gamified rewards ecosystem combining Strava workout telemetry, geofenced canteen ordering, and microservices orchestrations.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Containers</div>
+                                <div class="text-sm font-bold text-amber-400">8 K8s Pods</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Event Bus</div>
+                                <div class="text-sm font-bold text-cyan-400">Redis Pub/Sub</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Fitness API</div>
+                                <div class="text-sm font-bold text-emerald-400">Strava Webhook</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Throughput</div>
+                                <div class="text-sm font-bold text-white">1,200 Req/s</div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <a href="https://github.com/ThiagarajanHariharan/Campquest" target="_blank" rel="noopener noreferrer" class="text-white bg-amber-600 hover:bg-amber-500 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-amber-500/20">Source Code ↗</a>
                         </div>
                     </div>
-
-                    <!-- Card 2: Document Processor API -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-purple-950/70 text-purple-300 border border-purple-800/60">AI & Vision</span>
-                                <a href="https://github.com/ThiagarajanHariharan/Document-Processor" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Document Processor API</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Automated document intelligence extraction pipeline extracting structured candidate JSON from resumes using Gemini Vision.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Python</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Gemini Vision</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">REST API</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 3: CampusQuest Go -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-950/70 text-blue-300 border border-blue-800/60">Microservices</span>
-                                <a href="https://github.com/ThiagarajanHariharan/Campquest" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">CampusQuest Go</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Location-aware microservices ecosystem integrating Strava fitness tracking, geofenced canteen ordering, and reward point systems.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Docker</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Kubernetes</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Strava API</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Node.js</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 4: Questify -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-purple-950/70 text-purple-300 border border-purple-800/60">AI & Web</span>
-                                <a href="https://github.com/ThiagarajanHariharan/Questify" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Questify AI</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Personalized real-world sidequest generator using Gemini AI to craft customized challenge tasks with automated completion proof feedback.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Node.js</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Express</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">EJS</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Google Gemini</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 5: GitHub Profile Cleaner & Auditor -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-950/70 text-emerald-300 border border-emerald-800/60">DevOps & Security</span>
-                                <a href="https://github.com/ThiagarajanHariharan/github-profile-cleaner" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">GitHub Profile Auditor</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Repository auditing dashboard that scans codebases for leaked API secrets, synchronizes README files, and generates portfolios.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Python</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Security Scan</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Git API</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 6: SupermarketApp Cloud -->
-                    <div class="bg-card border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-950/70 text-blue-300 border border-blue-800/60">Cloud DB & CD</span>
-                                <a href="https://github.com/ThiagarajanHariharan/supermarketapp-l20" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Supermarket Cloud App</h4>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                                Full-stack database management platform with Azure Database for MySQL and automated continuous deployment pipeline on Render.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Azure MySQL</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Render CD</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Node.js</span>
-                            <span class="bg-slate-800/80 px-2 py-0.5 rounded">Express</span>
-                        </div>
-                    </div>
-
                 </div>
+
+                <!-- Project 5: Document Processor -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="relative rounded-2xl overflow-hidden border border-slate-700 bg-card shadow-2xl group">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/90 border-b border-slate-700 text-xs font-mono">
+                            <span class="text-emerald-400 font-bold">Document Processor — Gemini Vision ATS</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMedia('dp', 'video')" id="dp-btn-video" class="px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold transition-all text-xs">🎬 Test Scenario</button>
+                                <button onclick="toggleMedia('dp', 'img')" id="dp-btn-img" class="px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 hover:text-white transition-all text-xs">📸 Screenshot</button>
+                            </div>
+                        </div>
+                        <div class="h-[360px] w-full bg-slate-950 flex items-center justify-center relative">
+                            <video id="dp-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                                <source src="assets/videos/docprocessor_demo.mp4" type="video/mp4">
+                            </video>
+                            <img id="dp-img" src="assets/projects/docprocessor_preview.png" alt="Document Processor Scanner" class="w-full h-full object-cover hidden">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800 text-xs font-semibold text-emerald-300 mb-3">
+                            AUTOMATION & DOCUMENT AI
+                        </div>
+                        <h3 class="text-3xl font-bold text-white mb-3">Document Processor & ATS Scanner</h3>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            An AI-powered document processing pipeline that parses complex multi-page resumes and certificates, redacts PII for GDPR compliance, and evaluates candidate fit using Gemini Vision.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">OCR Engine</div>
+                                <div class="text-sm font-bold text-emerald-400">Gemini 1.5 Pro</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Extraction</div>
+                                <div class="text-sm font-bold text-cyan-400">Pydantic JSON</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Privacy</div>
+                                <div class="text-sm font-bold text-purple-400">PII Redacted</div>
+                            </div>
+                            <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl">
+                                <div class="text-xs text-slate-400">Match Accuracy</div>
+                                <div class="text-sm font-bold text-white">98.8%</div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <a href="https://github.com/ThiagarajanHariharan/Document-Processor" target="_blank" rel="noopener noreferrer" class="text-white bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm shadow-md shadow-emerald-500/20">Source Code ↗</a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Contribution Blaster Arcade Section -->
     <section id="arcade" class="py-20 bg-slate-950 border-t border-b border-slate-800/80 relative overflow-hidden">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
