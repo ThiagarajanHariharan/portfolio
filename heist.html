@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏎️ The Louvre Heist | 3D Interactive Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="An interactive 3D getaway car portfolio. Drive through the Louvre, explore engineering project exhibits, and escape to the safehouse!">
+    <title>🗺️ The Louvre Heist | Real Google Map 3D Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="A real-world GIS 3D getaway car portfolio through Paris and the Louvre Museum Cour Napoléon (48.8606° N, 2.3376° E).">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🏎️ The Louvre Heist | 3D Interactive Portfolio">
-    <meta property="og:description" content="A 3D getaway car heist portfolio experience built with Three.js.">
+    <meta property="og:title" content="🗺️ The Louvre Heist | Real Google Map 3D Portfolio">
+    <meta property="og:description" content="Drive a getaway car across real Paris satellite map coordinates in 3D.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
     <meta name="theme-color" content="#020617">
@@ -16,7 +16,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,11 +28,15 @@
                         sans: ["Inter", "sans-serif"],
                         museum: ["Cinzel", "serif"],
                         cyber: ["Orbitron", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"]
                     },
                     colors: {
                         gold: "#fbbf24",
                         heistRed: "#ef4444",
                         heistCyan: "#06b6d4",
+                        gmapGreen: "#34a853",
+                        gmapBlue: "#4285f4",
+                        gmapYellow: "#fbbc05"
                     }
                 }
             }
@@ -46,7 +50,7 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #020617; }
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -73,25 +77,30 @@
 
     <!-- 3D Game Canvas Viewport -->
     <div id="game-container" class="w-full h-full absolute inset-0"></div>
-    <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-30"></div>
+    <div class="scanline absolute inset-0 z-10 pointer-events-none opacity-25"></div>
 
-    <!-- Top Mission & Status HUD -->
+    <!-- Top GPS Navigation & Objective HUD -->
     <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         
-        <!-- Mission Status -->
-        <div class="glass-panel rounded-2xl px-4 py-2.5 pointer-events-auto flex items-center gap-3 shadow-2xl border border-slate-700/60">
-            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/50 flex items-center justify-center text-xl" id="status-icon">
-                🏎️
+        <!-- Live GPS & Location Badge -->
+        <div class="glass-panel rounded-2xl px-4 py-2.5 pointer-events-auto flex items-center gap-3 shadow-2xl border border-slate-700/80">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/50 flex items-center justify-center text-xl" id="status-icon">
+                🛰️
             </div>
             <div>
-                <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400">OPERATION: LOUVRE INFILTRATION</div>
-                <div class="text-sm font-cyber font-extrabold text-white flex items-center gap-2" id="mission-objective">
-                    RAM THE GLASS PYRAMID AT FULL SPEED!
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> GPS LIVE
+                    </span>
+                    <span class="text-[10px] font-mono text-slate-400" id="gps-coords-hud">48.860611° N, 2.337644° E</span>
+                </div>
+                <div class="text-sm font-cyber font-extrabold text-white flex items-center gap-2" id="street-location-hud">
+                    📍 COUR NAPOLÉON // LOUVRE PYRAMID
                 </div>
             </div>
         </div>
 
-        <!-- Radar Mini-Map, Camera & Exit -->
+        <!-- Google Maps Satellite Radar, Camera & Exit -->
         <div class="flex items-center gap-3 pointer-events-auto">
             <!-- Camera Toggle Button -->
             <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg">
@@ -102,16 +111,19 @@
             <div class="glass-panel rounded-2xl px-4 py-2.5 flex items-center gap-2.5 border border-amber-500/40 shadow-lg shadow-amber-500/10">
                 <span class="text-xl">🖼️</span>
                 <div>
-                    <div class="text-[9px] font-mono text-amber-400 uppercase tracking-widest">MASTERPIECES</div>
+                    <div class="text-[9px] font-mono text-amber-400 uppercase tracking-widest">STOLEN ARTIFACTS</div>
                     <div class="text-sm font-cyber font-bold text-white">
-                        <span id="stolen-count" class="text-amber-300">0</span> / 4 STOLEN
+                        <span id="stolen-count" class="text-amber-300">0</span> / 4 EXHIBITS
                     </div>
                 </div>
             </div>
 
-            <!-- Mini-Map Radar -->
-            <div class="glass-panel rounded-2xl p-1.5 border border-slate-700/80 shadow-2xl relative">
-                <canvas id="radar-canvas" width="76" height="76" class="rounded-xl block"></canvas>
+            <!-- Real Google Map Satellite Radar -->
+            <div class="glass-panel rounded-2xl p-1.5 border border-blue-500/40 shadow-2xl relative">
+                <div class="absolute -top-2 -left-2 bg-blue-600 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-md font-mono z-10 shadow">
+                    MAPS
+                </div>
+                <canvas id="radar-canvas" width="88" height="88" class="rounded-xl block"></canvas>
             </div>
 
             <a href="index.html" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-medium text-xs border border-slate-700 transition-all flex items-center gap-1.5">
@@ -128,9 +140,9 @@
         </div>
     </div>
 
-    <!-- Bottom Left: Speedometer & Controls HUD -->
+    <!-- Bottom Left: Speedometer & Paris Street Telemetry -->
     <div class="absolute bottom-4 left-4 z-20 pointer-events-none flex flex-col gap-2">
-        <div class="glass-panel rounded-2xl p-4 w-48 border border-slate-700/60 pointer-events-auto shadow-2xl">
+        <div class="glass-panel rounded-2xl p-4 w-52 border border-slate-700/60 pointer-events-auto shadow-2xl">
             <div class="flex justify-between items-center mb-1">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">VELOCITY</span>
                 <span class="text-xs font-mono text-cyan-400" id="gear-indicator">GEAR 1</span>
@@ -142,6 +154,11 @@
             
             <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
                 <div id="speedometer-bar" class="bg-gradient-to-r from-cyan-400 via-emerald-400 to-red-500 h-full w-0 transition-all duration-75"></div>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-slate-800 text-[10px] font-mono text-slate-400 flex justify-between items-center">
+                <span>SECTOR: PARIS 1er</span>
+                <span class="text-emerald-400 font-bold" id="sector-compass">HDG 0° N</span>
             </div>
         </div>
 
@@ -223,7 +240,7 @@
             <div class="text-xs font-mono text-emerald-400 uppercase tracking-widest mb-1">ENCRYPTED TRANSMISSION FROM THE AGENT</div>
             <h2 class="text-3xl font-cyber font-black text-white mb-2">HEIST SUCCESSFUL. REPOSITORIES SECURED.</h2>
             <p class="text-slate-400 text-sm max-w-lg mx-auto mb-6">
-                "Outstanding driving, operative. You breached the Louvre, liberated Hariharan's engineering masterpieces, and reached the extraction tunnel. Here are your decrypted repository keys."
+                "Outstanding driving, operative. You breached the Louvre across Paris coordinates, liberated Hariharan's engineering masterpieces, and reached the extraction tunnel. Here are your decrypted repository keys."
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left mb-6">
@@ -261,7 +278,7 @@
         const EXHIBITS_DATA = [
             {
                 id: "campus-found",
-                wing: "WING A: CLOUD ARCHITECTURE",
+                wing: "AILE RICHELIEU // NORTH WING",
                 title: "The Cloud Bastion (Campus Found)",
                 subtitle: "AWS EKS, Terraform, Multi-AZ VPC, RDS",
                 icon: "☁️",
@@ -269,12 +286,14 @@
                 desc: "Containerized lost-and-found platform deployed on AWS EKS across a Multi-AZ VPC with automated Terraform infrastructure and Gemini AI verification.",
                 tags: ["AWS EKS", "Multi-AZ VPC", "Terraform", "PostgreSQL"],
                 github: "https://github.com/ThiagarajanHariharan/campus-found",
-                pos: { x: -25, y: 3.5, z: -45 },
+                pos: { x: -28, y: 3.5, z: -45 },
+                lat: 48.8614,
+                lng: 2.3368,
                 stolen: false
             },
             {
                 id: "quartermaster",
-                wing: "WING B: EDGE COMPUTER VISION",
+                wing: "AILE DENON // SOUTH WING",
                 title: "The Cyber Kinematic (Quartermaster)",
                 subtitle: "Flutter, ML Kit, fllama Offline LLM, 320 Tests",
                 icon: "🛡️",
@@ -282,12 +301,14 @@
                 desc: "Military fitness accountability app with 100% offline edge computer vision pose tracking, 1-Euro adaptive jitter filter, local AI audio coaching, and zero-cloud P2P mesh sync.",
                 tags: ["Flutter", "Google ML Kit", "fllama LLM", "320 Tests"],
                 github: "https://github.com/ThiagarajanHariharan/Quartermaster",
-                pos: { x: 25, y: 3.5, z: -45 },
+                pos: { x: 28, y: 3.5, z: -45 },
+                lat: 48.8598,
+                lng: 2.3368,
                 stolen: false
             },
             {
                 id: "m1-edge-ai",
-                wing: "WING C: LOCAL AI INTELLIGENCE",
+                wing: "COUR SULLY // EAST WING",
                 title: "The Silicon Oracle (M1 Edge Pipeline)",
                 subtitle: "Qwen2.5-VL 7B, Whisper, Apple Silicon Edge",
                 icon: "🧠",
@@ -295,12 +316,14 @@
                 desc: "Zero-cloud multi-modal video intelligence pipeline processing 90-minute technical recordings on local M1 hardware with 11h sustained 100% GPU performance at 71°C.",
                 tags: ["Qwen2.5-VL", "Whisper", "Apple Silicon", "FFmpeg"],
                 github: "https://github.com/ThiagarajanHariharan/autovideoclipper",
-                pos: { x: -25, y: 3.5, z: -85 },
+                pos: { x: -28, y: 3.5, z: -85 },
+                lat: 48.8614,
+                lng: 2.3385,
                 stolen: false
             },
             {
                 id: "campus-quest",
-                wing: "WING D: MICROSERVICES & REWARDS",
+                wing: "CARROUSEL // WEST GALLERY",
                 title: "The Campus Quest (Campquest Go)",
                 subtitle: "Docker, Kubernetes, Strava API, Microservices",
                 icon: "🚴",
@@ -308,10 +331,20 @@
                 desc: "Location-aware microservices ecosystem integrating Strava fitness workout points, geofenced ordering, and containerized Docker/Kubernetes architecture.",
                 tags: ["Docker", "Kubernetes", "Strava API", "Node.js"],
                 github: "https://github.com/ThiagarajanHariharan/Campquest",
-                pos: { x: 25, y: 3.5, z: -85 },
+                pos: { x: 28, y: 3.5, z: -85 },
+                lat: 48.8598,
+                lng: 2.3385,
                 stolen: false
             }
         ];
+
+        // Paris GPS Base Datum (Cour Napoléon, Louvre)
+        const GPS_BASE = {
+            lat: 48.860611,
+            lng: 2.337644,
+            metersPerDegLat: 111139,
+            metersPerDegLng: 73000
+        };
 
         class LouvreHeistGame {
             constructor() {
@@ -321,10 +354,12 @@
                 this.gearIndicator = document.getElementById("gear-indicator");
                 this.proximityPrompt = document.getElementById("proximity-prompt");
                 this.proximityText = document.getElementById("proximity-text");
-                this.missionObjective = document.getElementById("mission-objective");
                 this.stolenCountEl = document.getElementById("stolen-count");
                 this.camToggleBtn = document.getElementById("cam-toggle-btn");
                 this.camLabel = document.getElementById("cam-label");
+                this.gpsCoordsHud = document.getElementById("gps-coords-hud");
+                this.streetLocationHud = document.getElementById("street-location-hud");
+                this.sectorCompass = document.getElementById("sector-compass");
                 this.radarCanvas = document.getElementById("radar-canvas");
                 this.radarCtx = this.radarCanvas.getContext("2d");
                 
@@ -343,7 +378,7 @@
                 this.restartBtn = document.getElementById("restart-heist-btn");
 
                 // Camera Mode
-                this.camMode = "chase"; // 'chase' or 'topdown'
+                this.camMode = "chase";
 
                 // Game State
                 this.stolenExhibits = new Set();
@@ -354,7 +389,7 @@
 
                 // Car Physics State
                 this.car = {
-                    pos: new THREE.Vector3(0, 0.5, 55),
+                    pos: new THREE.Vector3(0, 0.5, 60),
                     vel: new THREE.Vector3(0, 0, 0),
                     speed: 0,
                     maxSpeed: 1.15,
@@ -391,7 +426,7 @@
             init() {
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x040711);
-                this.scene.fog = new THREE.FogExp2(0x040711, 0.012);
+                this.scene.fog = new THREE.FogExp2(0x040711, 0.010);
 
                 this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 350);
                 
@@ -403,9 +438,9 @@
                 this.container.appendChild(this.renderer.domElement);
 
                 this.setupLighting();
-                this.buildEnvironment();
+                this.buildSatelliteGroundMesh();
                 this.buildLouvrePyramid();
-                this.buildGrandGallery();
+                this.buildParisianPalaceWings();
                 this.buildCar();
                 this.bindEvents();
 
@@ -417,7 +452,7 @@
                 const ambient = new THREE.AmbientLight(0x1e293b, 1.4);
                 this.scene.add(ambient);
 
-                const moonlight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+                const moonlight = new THREE.DirectionalLight(0x93c5fd, 1.1);
                 moonlight.position.set(50, 90, 50);
                 moonlight.castShadow = true;
                 moonlight.shadow.mapSize.width = 2048;
@@ -433,14 +468,68 @@
                 }
             }
 
-            buildEnvironment() {
+            // ----------------------------------------------------
+            // 🛰️ REAL SATELLITE MAP TERRAIN MESH
+            // ----------------------------------------------------
+            buildSatelliteGroundMesh() {
+                // High-Resolution Satellite Map Procedural Canvas Texture
+                const mapCanvas = document.createElement("canvas");
+                mapCanvas.width = 1024;
+                mapCanvas.height = 1024;
+                const mCtx = mapCanvas.getContext("2d");
+
+                // Satellite asphalt / cobblestone base
+                mCtx.fillStyle = "#0c1322";
+                mCtx.fillRect(0, 0, 1024, 1024);
+
+                // Paris Cour Napoléon central plaza pavers
+                mCtx.fillStyle = "#151e33";
+                mCtx.fillRect(200, 150, 624, 724);
+
+                // Reflecting Fountains around Pyramid
+                mCtx.fillStyle = "#0284c7";
+                mCtx.fillRect(360, 480, 80, 80);
+                mCtx.fillRect(584, 480, 80, 80);
+                mCtx.fillRect(472, 380, 80, 60);
+
+                // Cobblestone Grid lines
+                mCtx.strokeStyle = "rgba(56, 189, 248, 0.15)";
+                mCtx.lineWidth = 2;
+                for (let i = 200; i <= 824; i += 60) {
+                    mCtx.beginPath();
+                    mCtx.moveTo(i, 150);
+                    mCtx.lineTo(i, 874);
+                    mCtx.stroke();
+                }
+                for (let j = 150; j <= 874; j += 60) {
+                    mCtx.beginPath();
+                    mCtx.moveTo(200, j);
+                    mCtx.lineTo(824, j);
+                    mCtx.stroke();
+                }
+
+                // Satellite Cartography Stamp
+                mCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                mCtx.font = "bold 16px monospace";
+                mCtx.fillText("GOOGLE MAPS GIS SATELLITE // 48.8606°N 2.3376°E", 230, 850);
+                mCtx.fillText("COUR NAPOLÉON - PALAIS DU LOUVRE, PARIS", 230, 825);
+
+                const satelliteTex = new THREE.CanvasTexture(mapCanvas);
+                satelliteTex.wrapS = THREE.ClampToEdgeWrapping;
+                satelliteTex.wrapT = THREE.ClampToEdgeWrapping;
+
                 const groundGeo = new THREE.PlaneGeometry(160, 280);
-                const groundMat = new THREE.MeshStandardMaterial({ color: 0x0b1120, roughness: 0.35, metalness: 0.4 });
+                const groundMat = new THREE.MeshStandardMaterial({
+                    map: satelliteTex,
+                    roughness: 0.35,
+                    metalness: 0.4
+                });
                 const ground = new THREE.Mesh(groundGeo, groundMat);
                 ground.rotation.x = -Math.PI / 2;
                 ground.receiveShadow = true;
                 this.scene.add(ground);
 
+                // Perimeter Walls
                 const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
                 const backWall = new THREE.Mesh(new THREE.BoxGeometry(160, 16, 4), wallMat);
                 backWall.position.set(0, 8, 85);
@@ -506,36 +595,30 @@
                 canvas.height = 320;
                 const ctx = canvas.getContext("2d");
 
-                // Background
                 ctx.fillStyle = "#0f172a";
                 ctx.fillRect(0, 0, 512, 320);
 
-                // Accent border
                 ctx.strokeStyle = exhibit.color;
                 ctx.lineWidth = 8;
                 ctx.strokeRect(8, 8, 496, 304);
 
-                // Top Wing header
                 ctx.fillStyle = exhibit.color;
                 ctx.fillRect(8, 8, 496, 44);
                 ctx.fillStyle = "#020617";
-                ctx.font = "bold 18px Orbitron, sans-serif";
+                ctx.font = "bold 16px JetBrains Mono, monospace";
                 ctx.fillText(exhibit.wing, 24, 36);
 
-                // Title & Subtitle
                 ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 26px Cinzel, serif";
+                ctx.font = "bold 24px Cinzel, serif";
                 ctx.fillText(exhibit.title, 24, 95);
 
                 ctx.fillStyle = "#94a3b8";
                 ctx.font = "14px Inter, sans-serif";
                 ctx.fillText(exhibit.subtitle, 24, 125);
 
-                // Icon Preview
                 ctx.font = "64px serif";
                 ctx.fillText(exhibit.icon, 380, 180);
 
-                // Tech tags
                 let tagX = 24;
                 exhibit.tags.forEach(tag => {
                     ctx.fillStyle = "#1e293b";
@@ -544,7 +627,7 @@
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(tagX, 250, ctx.measureText(tag).width + 24, 32);
                     ctx.fillStyle = "#38bdf8";
-                    ctx.font = "bold 13px Orbitron, sans-serif";
+                    ctx.font = "bold 13px JetBrains Mono, monospace";
                     ctx.fillText(tag, tagX + 12, 271);
                     tagX += ctx.measureText(tag).width + 36;
                 });
@@ -554,7 +637,7 @@
                 return { texture, canvas };
             }
 
-            buildGrandGallery() {
+            buildParisianPalaceWings() {
                 const marbleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2, metalness: 0.3 });
                 const goldMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.8, roughness: 0.3 });
 
@@ -586,7 +669,6 @@
                     painting.position.z = 0.22;
                     frameGroup.add(painting);
 
-                    // Holographic Proximity Ring on floor
                     const ringMat = new THREE.MeshBasicMaterial({ color: ex.color, wireframe: true });
                     const ring = new THREE.Mesh(new THREE.RingGeometry(3.5, 4.5, 16), ringMat);
                     ring.rotation.x = -Math.PI / 2;
@@ -617,7 +699,6 @@
                 const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
                 const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
 
-                // Chassis container for suspension tilting
                 this.carChassisGroup = new THREE.Group();
                 this.carGroup.add(this.carChassisGroup);
 
@@ -634,7 +715,6 @@
                 spoiler.position.set(0, 1.3, 2.1);
                 this.carChassisGroup.add(spoiler);
 
-                // Front Wheels (Steerable)
                 this.car.frontWheels = [];
                 [[-1.3, 0.4, -1.4], [1.3, 0.4, -1.4]].forEach(([x, y, z]) => {
                     const wheelHolder = new THREE.Group();
@@ -649,18 +729,16 @@
                     this.car.frontWheels.push({ holder: wheelHolder, wheel: wheel });
                 });
 
-                // Rear Wheels
                 this.car.rearWheels = [];
                 [[-1.3, 0.4, 1.4], [1.3, 0.4, 1.4]].forEach(([x, y, z]) => {
                     const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
                     wheel.rotation.z = Math.PI / 2;
-                    wheel.position.set(x, y, z);
                     wheel.castShadow = true;
-                    this.carGroup.add(wheel);
+                    wheelGroup: this.carGroup.add(wheel);
+                    wheel.position.set(x, y, z);
                     this.car.rearWheels.push(wheel);
                 });
 
-                // Headlights
                 const headL = new THREE.SpotLight(0xffffff, 3.5, 50, Math.PI / 5, 0.4);
                 headL.position.set(-0.8, 0.7, -2.4);
                 headL.target.position.set(-0.8, 0, -20);
@@ -703,9 +781,6 @@
                     this.scene.add(shard);
                     this.shards.push(shard);
                 }
-
-                this.missionObjective.textContent = "DRIFT GALLERIES & STEAL ALL 4 MASTERPIECES!";
-                this.missionObjective.classList.add("text-amber-400");
             }
 
             spawnDriftSmoke(x, z) {
@@ -871,7 +946,7 @@
             }
 
             resetCarPosition() {
-                this.car.pos.set(0, 0.5, 55);
+                this.car.pos.set(0, 0.5, 60);
                 this.car.vel.set(0, 0, 0);
                 this.car.speed = 0;
                 this.car.heading = Math.PI;
@@ -886,7 +961,6 @@
                 this.modalDesc.textContent = exhibit.desc;
                 this.modalGithub.href = exhibit.github;
 
-                // Render preview
                 const prevCtx = this.modalCanvasPreview.getContext("2d");
                 if (exhibit.canvas) {
                     prevCtx.drawImage(exhibit.canvas, 0, 0, 640, 360);
@@ -934,16 +1008,10 @@
 
                 this.stolenCountEl.textContent = this.stolenExhibits.size;
                 this.closeInspectionModal();
-
-                if (this.stolenExhibits.size >= 4) {
-                    this.missionObjective.textContent = "🚨 ALL ARTWORKS STOLEN! ESCAPE TO SAFEHOUSE (NORTH END)!";
-                    this.missionObjective.classList.remove("text-amber-400");
-                    this.missionObjective.classList.add("text-emerald-400");
-                }
             }
 
             // ----------------------------------------------------
-            // 🗺️ 2D RADAR MINI-MAP RENDERER
+            // 🗺️ GOOGLE MAPS GIS SATELLITE RADAR
             // ----------------------------------------------------
             drawRadar() {
                 const ctx = this.radarCtx;
@@ -952,35 +1020,41 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // Background
-                ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+                // Satellite Dark Tile Base
+                ctx.fillStyle = "#0c1322";
                 ctx.fillRect(0, 0, w, h);
 
-                // Radar Grids
-                ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+                // Courtyard Plaza in Map
+                ctx.fillStyle = "#1e293b";
+                ctx.fillRect(14, 10, 60, 68);
+
+                // Grid Lines
+                ctx.strokeStyle = "rgba(66, 133, 244, 0.25)";
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.arc(w / 2, h / 2, 34, 0, Math.PI * 2);
-                ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2);
+                ctx.arc(w / 2, h / 2, 38, 0, Math.PI * 2);
+                ctx.arc(w / 2, h / 2, 22, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Map coordinates: X is [-60, 60] -> [4, 72], Z is [-135, 75] -> [4, 72]
-                const mapX = (x) => ((x + 60) / 120) * (w - 12) + 6;
-                const mapZ = (z) => ((z + 135) / 210) * (h - 12) + 6;
+                const mapX = (x) => ((x + 60) / 120) * (w - 16) + 8;
+                const mapZ = (z) => ((z + 135) / 210) * (h - 16) + 8;
 
-                // Exhibits
+                // Exhibits (Google Maps Pin Style)
                 EXHIBITS_DATA.forEach(ex => {
                     const exX = mapX(ex.pos.x);
                     const exZ = mapZ(ex.pos.z);
-                    ctx.fillStyle = ex.stolen ? "#10b981" : "#fbbf24";
+                    ctx.fillStyle = ex.stolen ? "#34a853" : "#ea4335";
                     ctx.beginPath();
-                    ctx.arc(exX, exZ, 3.5, 0, Math.PI * 2);
+                    ctx.arc(exX, exZ, 4, 0, Math.PI * 2);
                     ctx.fill();
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
                 });
 
-                // Safehouse Exit
-                ctx.fillStyle = "#22c55e";
-                ctx.fillRect(mapX(0) - 4, mapZ(-130) - 2, 8, 4);
+                // Safehouse Exit Marker
+                ctx.fillStyle = "#34a853";
+                ctx.fillRect(mapX(0) - 5, mapZ(-130) - 2, 10, 4);
 
                 // Player Car Marker
                 const playerX = mapX(this.car.pos.x);
@@ -989,26 +1063,53 @@
                 ctx.save();
                 ctx.translate(playerX, playerZ);
                 ctx.rotate(this.car.heading + Math.PI);
-                ctx.fillStyle = "#ef4444";
+                ctx.fillStyle = "#4285f4";
                 ctx.beginPath();
-                ctx.moveTo(0, -5);
-                ctx.lineTo(-3.5, 4);
-                ctx.lineTo(3.5, 4);
+                ctx.moveTo(0, -6);
+                ctx.lineTo(-4, 5);
+                ctx.lineTo(4, 5);
                 ctx.closePath();
                 ctx.fill();
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
                 ctx.restore();
             }
 
             // ----------------------------------------------------
-            // 🔄 PHYSICAL GAME & VEHICLE LOOP
+            // 📍 REAL WGS84 GPS COORDINATE TELEMETRY
             // ----------------------------------------------------
+            updateGPSTelemetry() {
+                // Approximate 1 Three.js unit = 1.8 meters
+                const deltaLat = (-this.car.pos.z * 1.8) / GPS_BASE.metersPerDegLat;
+                const deltaLng = (this.car.pos.x * 1.8) / GPS_BASE.metersPerDegLng;
+
+                const currentLat = (GPS_BASE.lat + deltaLat).toFixed(6);
+                const currentLng = (GPS_BASE.lng + deltaLng).toFixed(6);
+
+                this.gpsCoordsHud.textContent = currentLat + "° N, " + currentLng + "° E";
+
+                // Determine Parisian Street Sector
+                if (this.car.pos.z < -90) {
+                    this.streetLocationHud.textContent = "📍 JARDIN DES TUILERIES // SAFEHOUSE GATE";
+                } else if (this.car.pos.z < -30) {
+                    this.streetLocationHud.textContent = "📍 COUR SULLY // GRAND MARBLE GALLERY";
+                } else if (Math.abs(this.car.pos.z) <= 30) {
+                    this.streetLocationHud.textContent = "📍 COUR NAPOLÉON // PYRAMIDE DU LOUVRE";
+                } else {
+                    this.streetLocationHud.textContent = "📍 RUE DE RIVOLI // SOUTH INGRESS COURTYARD";
+                }
+
+                const degHeading = Math.round(((this.car.heading * 180 / Math.PI) % 360 + 360) % 360);
+                this.sectorCompass.textContent = "HDG " + degHeading + "°";
+            }
+
             updateCarPhysics() {
                 if (this.modalOpen) {
                     this.car.speed *= 0.8;
                     return;
                 }
 
-                // Acceleration & Braking
                 if (this.keys.up) {
                     this.car.speed = Math.min(this.car.speed + this.car.accel, this.car.maxSpeed);
                 } else if (this.keys.down) {
@@ -1017,7 +1118,6 @@
                     this.car.speed *= this.car.friction;
                 }
 
-                // Dynamic Steering with Drift
                 const steerMultiplier = this.keys.drift ? 0.055 : 0.038;
                 if (this.keys.left && Math.abs(this.car.speed) > 0.01) {
                     this.car.heading += (this.car.speed > 0 ? 1 : -1) * steerMultiplier;
@@ -1031,17 +1131,14 @@
                     this.car.steerAngle *= 0.85;
                 }
 
-                // Position update
                 this.car.pos.x -= Math.sin(this.car.heading) * this.car.speed;
                 this.car.pos.z -= Math.cos(this.car.heading) * this.car.speed;
 
-                // Boundary bounds collision with bounce
                 if (this.car.pos.x < -50) { this.car.pos.x = -50; this.car.speed *= -0.3; }
                 if (this.car.pos.x > 50) { this.car.pos.x = 50; this.car.speed *= -0.3; }
                 if (this.car.pos.z > 70) { this.car.pos.z = 70; this.car.speed *= -0.3; }
                 if (this.car.pos.z < -135) { this.car.pos.z = -135; this.car.speed *= -0.3; }
 
-                // Pyramid Smash detection
                 if (!this.pyramidShattered && Math.abs(this.car.pos.z) < 12 && Math.abs(this.car.pos.x) < 14) {
                     if (Math.abs(this.car.speed) > 0.25) {
                         this.triggerPyramidShatter();
@@ -1050,7 +1147,6 @@
                     }
                 }
 
-                // Suspension Tilt (Pitch & Roll)
                 const pitch = -this.car.speed * 0.08;
                 const roll = -this.car.steerAngle * (this.car.speed / this.car.maxSpeed) * 0.12;
                 if (this.car.chassis) {
@@ -1058,7 +1154,6 @@
                     this.car.chassis.rotation.z = roll;
                 }
 
-                // Wheels Rotation & Steering
                 this.car.frontWheels.forEach(fw => {
                     fw.holder.rotation.y = this.car.steerAngle;
                     fw.wheel.rotation.x += this.car.speed * 1.5;
@@ -1070,7 +1165,6 @@
                 this.car.mesh.position.copy(this.car.pos);
                 this.car.mesh.rotation.y = this.car.heading;
 
-                // Camera follow modes
                 if (this.camMode === "chase") {
                     const camDist = 12;
                     const camHeight = 5.5;
@@ -1082,18 +1176,17 @@
                     this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
                     this.camera.lookAt(this.car.pos.x, this.car.pos.y + 1.2, this.car.pos.z);
                 } else {
-                    // Top-Down Overview Mode
                     this.camera.position.set(this.car.pos.x, 38, this.car.pos.z + 10);
                     this.camera.lookAt(this.car.pos.x, 0, this.car.pos.z);
                 }
 
-                // Speedometer HUD
                 const kmh = Math.round(Math.abs(this.car.speed) * 160);
                 this.speedometerVal.textContent = kmh;
                 this.speedometerBar.style.width = Math.min(kmh / 1.5, 100) + "%";
                 this.gearIndicator.textContent = kmh > 90 ? "GEAR 4" : (kmh > 50 ? "GEAR 3" : (kmh > 20 ? "GEAR 2" : "GEAR 1"));
 
                 this.updateEngineAudio();
+                this.updateGPSTelemetry();
                 this.drawRadar();
             }
 
