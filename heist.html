@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🗺️ The Louvre Heist | Live Satellite Map 3D Portfolio — Thiagarajan Hariharan</title>
-    <meta name="description" content="An interactive 3D getaway car portfolio driven over real Paris satellite imagery and live Leaflet GPS map tracking.">
+    <title>🏎️ The Louvre Heist | AAA 3D Getaway Car Portfolio — Thiagarajan Hariharan</title>
+    <meta name="description" content="A cinematic 3D getaway car portfolio driven over real Paris satellite imagery and live Leaflet GPS map tracking.">
     
     <!-- OpenGraph -->
-    <meta property="og:title" content="🗺️ The Louvre Heist | Live Satellite Map 3D Portfolio">
-    <meta property="og:description" content="Drive a getaway car over real Paris satellite map imagery in 3D.">
+    <meta property="og:title" content="🏎️ The Louvre Heist | AAA 3D Portfolio">
+    <meta property="og:description" content="Cinematic 3D getaway car experience through the Louvre Museum, Paris.">
     <meta property="og:image" content="https://thiagarajanhariharan.github.io/portfolio/campus_found_arch.mp4">
     <meta property="og:url" content="https://thiagarajanhariharan.github.io/portfolio/heist.html">
     <meta name="theme-color" content="#020617">
@@ -42,7 +42,7 @@
         }
     </script>
 
-    <!-- Leaflet.js (Live Real Satellite Map Engine) -->
+    <!-- Leaflet.js (Live Satellite Map Engine) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -54,13 +54,14 @@
         canvas { display: block; width: 100%; height: 100%; }
         .glass-panel {
             background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         .gold-border {
             border: 2px solid #fbbf24;
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.35);
+            box-shadow: 0 0 35px rgba(251, 191, 36, 0.35);
         }
         .red-alert-pulse {
             animation: redAlert 1.2s infinite alternate;
@@ -92,7 +93,7 @@
             background: #00f2ff;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 0 12px #00f2ff;
+            box-shadow: 0 0 14px #00f2ff;
         }
     </style>
 </head>
@@ -107,7 +108,7 @@
         
         <!-- Live GPS & Location Badge -->
         <div class="glass-panel rounded-2xl px-4 py-2.5 pointer-events-auto flex items-center gap-3 shadow-2xl border border-slate-700/80">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/50 flex items-center justify-center text-xl" id="status-icon">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/50 flex items-center justify-center text-xl shadow-inner" id="status-icon">
                 🛰️
             </div>
             <div>
@@ -126,7 +127,7 @@
         <!-- Live Leaflet Satellite Radar & Controls -->
         <div class="flex items-center gap-3 pointer-events-auto">
             <!-- Camera Toggle Button -->
-            <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg">
+            <button id="cam-toggle-btn" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-mono text-xs border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95">
                 <span>🎥</span> <span id="cam-label">CAM: CHASE</span>
             </button>
 
@@ -149,7 +150,7 @@
                 <div id="leaflet-map"></div>
             </div>
 
-            <a href="index.html" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-medium text-xs border border-slate-700 transition-all flex items-center gap-1.5">
+            <a href="index.html" class="glass-panel hover:bg-slate-800 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl font-medium text-xs border border-slate-700 transition-all flex items-center gap-1.5 active:scale-95">
                 <span>↩</span> Exit
             </a>
         </div>
@@ -158,7 +159,7 @@
     <!-- Proximity Interaction Prompt [Press E] -->
     <div id="proximity-prompt" class="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 opacity-0 transition-all duration-300 pointer-events-none transform translate-y-4">
         <div class="glass-panel px-6 py-3.5 rounded-2xl border-2 border-amber-400 shadow-2xl shadow-amber-500/30 flex items-center gap-3 animate-bounce">
-            <span class="px-2.5 py-1 bg-amber-400 text-slate-950 font-cyber font-black text-sm rounded-lg">E</span>
+            <span class="px-2.5 py-1 bg-amber-400 text-slate-950 font-cyber font-black text-sm rounded-lg shadow">E</span>
             <span class="text-white font-bold text-sm tracking-wide" id="proximity-text">INSPECT MASTERPIECE</span>
         </div>
     </div>
@@ -168,7 +169,7 @@
         <div class="glass-panel rounded-2xl p-4 w-52 border border-slate-700/60 pointer-events-auto shadow-2xl">
             <div class="flex justify-between items-center mb-1">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">VELOCITY</span>
-                <span class="text-xs font-mono text-cyan-400" id="gear-indicator">GEAR 1</span>
+                <span class="text-xs font-mono text-cyan-400 font-bold" id="gear-indicator">GEAR 1</span>
             </div>
             <div class="flex items-baseline gap-1.5">
                 <span class="text-3xl font-cyber font-black text-white" id="speedometer-val">0</span>
@@ -186,7 +187,7 @@
         </div>
 
         <div class="glass-panel rounded-xl px-3 py-2 text-[11px] text-slate-300 border border-slate-700/50 flex flex-wrap items-center gap-2">
-            <span>🎮 <strong>WASD / Arrows:</strong> Drive</span>
+            <span>🎮 <strong>WASD:</strong> Drive</span>
             <span>•</span>
             <span><strong class="text-amber-400">SPACE:</strong> Drift</span>
             <span>•</span>
@@ -206,7 +207,7 @@
             <button id="touch-down" class="w-14 h-14 glass-panel active:bg-cyan-600/60 rounded-2xl flex items-center justify-center text-2xl active:scale-95 border border-slate-600">⬇️</button>
             <button id="touch-right" class="w-14 h-14 glass-panel active:bg-cyan-600/60 rounded-2xl flex items-center justify-center text-2xl active:scale-95 border border-slate-600">➡️</button>
         </div>
-        <button id="touch-action" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold rounded-2xl shadow-lg text-xs">
+        <button id="touch-action" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-cyber font-bold rounded-2xl shadow-lg text-xs active:scale-95">
             [E] INSPECT / STEAL
         </button>
     </div>
@@ -419,7 +420,8 @@
                     mesh: null,
                     chassis: null,
                     frontWheels: [],
-                    rearWheels: []
+                    rearWheels: [],
+                    taillights: []
                 };
 
                 // Controls Input
@@ -433,6 +435,7 @@
 
                 this.shards = [];
                 this.smokeParticles = [];
+                this.fountainWaterMeshes = [];
                 
                 // Leaflet Map & Markers
                 this.leafletMap = null;
@@ -459,23 +462,22 @@
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.15;
                 this.container.appendChild(this.renderer.domElement);
 
                 this.initLeafletMap();
                 this.setupLighting();
                 this.buildRealSatelliteTerrain();
-                this.buildLouvrePyramid();
+                this.buildLouvrePyramidAndFountains();
                 this.buildParisianPalaceWings();
-                this.buildCar();
+                this.buildHighFidelitySportsCar();
                 this.bindEvents();
 
                 window.addEventListener("resize", () => this.onResize());
                 this.animate();
             }
 
-            // ----------------------------------------------------
-            // 🛰️ LEAFLET LIVE SATELLITE MAP ENGINE
-            // ----------------------------------------------------
             initLeafletMap() {
                 try {
                     this.leafletMap = L.map("leaflet-map", {
@@ -489,24 +491,21 @@
                         doubleClickZoom: false
                     });
 
-                    // Esri World Imagery Satellite Tile Layer (Real-time live tiles)
                     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
                         maxZoom: 19
                     }).addTo(this.leafletMap);
 
-                    // Add Exhibit Pins
                     EXHIBITS_DATA.forEach(ex => {
                         const marker = L.circleMarker([ex.lat, ex.lng], {
                             radius: 5,
                             color: "#ffffff",
                             fillColor: "#ef4444",
-                            fillOpacity: 0.9,
+                            fillOpacity: 0.95,
                             weight: 2
                         }).addTo(this.leafletMap);
                         this.exhibitMarkers[ex.id] = marker;
                     });
 
-                    // Add Player Car GPS Live Blinking Dot
                     const carIcon = L.divIcon({
                         className: "car-map-marker",
                         iconSize: [14, 14],
@@ -522,7 +521,7 @@
                 const ambient = new THREE.AmbientLight(0x1e293b, 1.4);
                 this.scene.add(ambient);
 
-                const moonlight = new THREE.DirectionalLight(0x93c5fd, 1.1);
+                const moonlight = new THREE.DirectionalLight(0x93c5fd, 1.2);
                 moonlight.position.set(50, 90, 50);
                 moonlight.castShadow = true;
                 moonlight.shadow.mapSize.width = 2048;
@@ -538,9 +537,6 @@
                 }
             }
 
-            // ----------------------------------------------------
-            // 🛰️ REAL SATELLITE TERRAIN TEXTURE MESH
-            // ----------------------------------------------------
             buildRealSatelliteTerrain() {
                 const textureLoader = new THREE.TextureLoader();
                 const satelliteTexture = textureLoader.load("louvre_satellite_real.jpg");
@@ -550,15 +546,15 @@
                 const groundGeo = new THREE.PlaneGeometry(160, 280);
                 const groundMat = new THREE.MeshStandardMaterial({
                     map: satelliteTexture,
-                    roughness: 0.35,
-                    metalness: 0.25
+                    roughness: 0.3,
+                    metalness: 0.35
                 });
                 const ground = new THREE.Mesh(groundGeo, groundMat);
                 ground.rotation.x = -Math.PI / 2;
                 ground.receiveShadow = true;
                 this.scene.add(ground);
 
-                const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+                const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
                 const backWall = new THREE.Mesh(new THREE.BoxGeometry(160, 16, 4), wallMat);
                 backWall.position.set(0, 8, 85);
                 this.scene.add(backWall);
@@ -577,14 +573,17 @@
                         pole.position.set(x, 5, z);
                         this.scene.add(pole);
 
-                        const lampLight = new THREE.PointLight(0xfef08a, 1.6, 30);
+                        const lampLight = new THREE.PointLight(0xfef08a, 1.8, 32);
                         lampLight.position.set(x, 10, z);
                         this.scene.add(lampLight);
                     }
                 }
             }
 
-            buildLouvrePyramid() {
+            // ----------------------------------------------------
+            // 🏛️ DETAILED DIAMOND LATTICE PYRAMID & WATER POOLS
+            // ----------------------------------------------------
+            buildLouvrePyramidAndFountains() {
                 this.pyramidGroup = new THREE.Group();
                 this.pyramidGroup.position.set(0, 0, 0);
 
@@ -593,27 +592,66 @@
                 
                 this.pyramidMat = new THREE.MeshPhysicalMaterial({
                     color: 0x38bdf8,
-                    transmission: 0.85,
-                    opacity: 0.9,
+                    transmission: 0.9,
+                    opacity: 0.95,
                     transparent: true,
-                    roughness: 0.1,
-                    metalness: 0.1,
-                    reflectivity: 0.9,
-                    clearcoat: 1
+                    roughness: 0.05,
+                    metalness: 0.15,
+                    reflectivity: 0.95,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1
                 });
 
                 this.pyramidMesh = new THREE.Mesh(pyrGeo, this.pyramidMat);
                 this.pyramidMesh.position.y = 7;
                 this.pyramidGroup.add(this.pyramidMesh);
 
-                const wireGeo = new THREE.ConeGeometry(18.05, 14.05, 4);
+                // Steel Diamond Truss Lattice
+                const wireGeo = new THREE.ConeGeometry(18.06, 14.06, 4, 6);
                 wireGeo.rotateY(Math.PI / 4);
-                const wireMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true });
+                const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
                 this.pyramidWire = new THREE.Mesh(wireGeo, wireMat);
                 this.pyramidWire.position.y = 7;
                 this.pyramidGroup.add(this.pyramidWire);
 
+                // Glowing Cyan Core Light
+                const coreLight = new THREE.PointLight(0x00f2ff, 3.5, 30);
+                coreLight.position.set(0, 5, 0);
+                this.pyramidGroup.add(coreLight);
+
                 this.scene.add(this.pyramidGroup);
+
+                // 3 Reflecting Water Fountain Pools surrounding Pyramid
+                const waterMat = new THREE.MeshStandardMaterial({
+                    color: 0x0284c7,
+                    roughness: 0.1,
+                    metalness: 0.9,
+                    transparent: true,
+                    opacity: 0.85
+                });
+                const poolBorderMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4 });
+
+                const poolCoords = [
+                    { x: -16, z: 0, w: 10, d: 20 },
+                    { x: 16, z: 0, w: 10, d: 20 },
+                    { x: 0, z: -16, w: 20, d: 10 }
+                ];
+
+                poolCoords.forEach(p => {
+                    const pool = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.4, p.d), poolBorderMat);
+                    pool.position.set(p.x, 0.2, p.z);
+                    this.scene.add(pool);
+
+                    const water = new THREE.Mesh(new THREE.PlaneGeometry(p.w - 1, p.d - 1), waterMat);
+                    water.rotation.x = -Math.PI / 2;
+                    water.position.set(p.x, 0.35, p.z);
+                    this.scene.add(water);
+                    this.fountainWaterMeshes.push(water);
+
+                    const waterGlow = new THREE.PointLight(0x38bdf8, 1.2, 14);
+                    waterGlow.position.set(p.x, 1, p.z);
+                    this.scene.add(waterGlow);
+                });
             }
 
             createExhibitTexture(exhibit) {
@@ -719,62 +757,113 @@
                 this.scene.add(this.safehouseZone);
             }
 
-            buildCar() {
+            // ----------------------------------------------------
+            // 🏎️ AAA HIGH-FIDELITY SPORTS CAR MODEL
+            // ----------------------------------------------------
+            buildHighFidelitySportsCar() {
                 this.carGroup = new THREE.Group();
 
-                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2, metalness: 0.8 });
-                const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
-                const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
+                // High-End Metallic Clearcoat Red Paint
+                const carPaintMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xef4444,
+                    metalness: 0.85,
+                    roughness: 0.15,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1,
+                    reflectivity: 0.9
+                });
+
+                const carbonMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.3, metalness: 0.8 });
+                const tintedGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x020617, roughness: 0.05, metalness: 0.95, transmission: 0.4 });
+                const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.1 });
+                const tireRubberMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.85 });
+                const brakeCaliperMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.7, roughness: 0.2 });
 
                 this.carChassisGroup = new THREE.Group();
                 this.carGroup.add(this.carChassisGroup);
 
-                const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.8, 4.8), bodyMat);
-                chassis.position.y = 0.6;
-                chassis.castShadow = true;
-                this.carChassisGroup.add(chassis);
+                // Lower Main Chassis with Aerodynamic Contours
+                const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 4.8), carPaintMat);
+                lowerBody.position.y = 0.45;
+                lowerBody.castShadow = true;
+                this.carChassisGroup.add(lowerBody);
 
-                const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.7, 2.4), glassMat);
-                cabin.position.set(0, 1.25, -0.3);
+                // Front Hood & Splitter
+                const hood = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 1.8), carPaintMat);
+                hood.position.set(0, 0.65, -1.2);
+                this.carChassisGroup.add(hood);
+
+                const frontSplitter = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.08, 0.6), carbonMat);
+                frontSplitter.position.set(0, 0.25, -2.4);
+                this.carChassisGroup.add(frontSplitter);
+
+                // Tapered Aerodynamic Cabin
+                const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.55, 2.2), tintedGlassMat);
+                cabin.position.set(0, 1.05, 0.0);
                 this.carChassisGroup.add(cabin);
 
-                const spoiler = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 0.6), bodyMat);
-                spoiler.position.set(0, 1.3, 2.1);
-                this.carChassisGroup.add(spoiler);
+                // Rear Carbon Wing & Diffuser
+                const rearWing = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.5), carbonMat);
+                rearWing.position.set(0, 1.25, 2.2);
+                this.carChassisGroup.add(rearWing);
 
-                this.car.frontWheels = [];
-                [[-1.3, 0.4, -1.4], [1.3, 0.4, -1.4]].forEach(([x, y, z]) => {
-                    const wheelHolder = new THREE.Group();
-                    wheelHolder.position.set(x, y, z);
+                const wingStrutL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.1), carbonMat);
+                wingStrutL.position.set(-0.8, 1.0, 2.2);
+                const wingStrutR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.1), carbonMat);
+                wingStrutR.position.set(0.8, 1.0, 2.2);
+                this.carChassisGroup.add(wingStrutL, wingStrutR);
 
-                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
-                    wheel.rotation.z = Math.PI / 2;
-                    wheel.castShadow = true;
-                    wheelHolder.add(wheel);
-
-                    this.carGroup.add(wheelHolder);
-                    this.car.frontWheels.push({ holder: wheelHolder, wheel: wheel });
-                });
-
-                this.car.rearWheels = [];
-                [[-1.3, 0.4, 1.4], [1.3, 0.4, 1.4]].forEach(([x, y, z]) => {
-                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16), wheelMat);
-                    wheel.rotation.z = Math.PI / 2;
-                    wheel.castShadow = true;
-                    wheel.position.set(x, y, z);
-                    this.carGroup.add(wheel);
-                    this.car.rearWheels.push(wheel);
-                });
-
-                const headL = new THREE.SpotLight(0xffffff, 3.5, 50, Math.PI / 5, 0.4);
-                headL.position.set(-0.8, 0.7, -2.4);
-                headL.target.position.set(-0.8, 0, -20);
+                // Front Projector Headlights
+                const headL = new THREE.SpotLight(0xffffff, 4.5, 55, Math.PI / 5, 0.35);
+                headL.position.set(-0.85, 0.65, -2.4);
+                headL.target.position.set(-0.85, 0, -25);
                 this.carGroup.add(headL, headL.target);
 
-                const headR = new THREE.SpotLight(0xffffff, 3.5, 50, Math.PI / 5, 0.4);
-                headR.position.set(0.8, 0.7, -2.4);
-                headR.target.position.set(0.8, 0, -20);
+                const headR = new THREE.SpotLight(0xffffff, 4.5, 55, Math.PI / 5, 0.35);
+                headR.position.set(0.85, 0.65, -2.4);
+                headR.target.position.set(0.85, 0, -25);
                 this.carGroup.add(headR, headR.target);
+
+                // LED Matrix Taillights
+                const tailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+                const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.1), tailMat);
+                tailL.position.set(-0.75, 0.65, 2.4);
+                const tailR = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.1), tailMat);
+                tailR.position.set(0.75, 0.65, 2.4);
+                this.carChassisGroup.add(tailL, tailR);
+                this.car.taillights = [tailL, tailR];
+
+                // 4 Detailed Alloy Wheels with Visible Spokes & Red Calipers
+                const makeAlloyWheel = (x, y, z, isFront) => {
+                    const holder = new THREE.Group();
+                    holder.position.set(x, y, z);
+
+                    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.36, 18), tireRubberMat);
+                    tire.rotation.z = Math.PI / 2;
+                    tire.castShadow = true;
+                    holder.add(tire);
+
+                    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.38, 8), chromeMat);
+                    rim.rotation.z = Math.PI / 2;
+                    holder.add(rim);
+
+                    const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.25, 0.22), brakeCaliperMat);
+                    caliper.position.set(x < 0 ? 0.12 : -0.12, 0.15, 0);
+                    holder.add(caliper);
+
+                    this.carGroup.add(holder);
+                    return { holder, wheel: tire };
+                };
+
+                this.car.frontWheels = [
+                    makeAlloyWheel(-1.25, 0.44, -1.4, true),
+                    makeAlloyWheel(1.25, 0.44, -1.4, true)
+                ];
+
+                this.car.rearWheels = [
+                    makeAlloyWheel(-1.25, 0.44, 1.4, false),
+                    makeAlloyWheel(1.25, 0.44, 1.4, false)
+                ];
 
                 this.carGroup.position.copy(this.car.pos);
                 this.scene.add(this.carGroup);
@@ -1033,7 +1122,6 @@
                     wireframe: true
                 });
 
-                // Update Leaflet marker color to green
                 if (this.exhibitMarkers[this.activeExhibit.id]) {
                     this.exhibitMarkers[this.activeExhibit.id].setStyle({ fillColor: "#10b981", color: "#10b981" });
                 }
@@ -1042,9 +1130,6 @@
                 this.closeInspectionModal();
             }
 
-            // ----------------------------------------------------
-            // 📍 REAL WGS84 GPS COORDINATE TELEMETRY & MAP SYNC
-            // ----------------------------------------------------
             updateGPSTelemetry() {
                 const deltaLat = (-this.car.pos.z * 1.8) / GPS_BASE.metersPerDegLat;
                 const deltaLng = (this.car.pos.x * 1.8) / GPS_BASE.metersPerDegLng;
@@ -1054,7 +1139,6 @@
 
                 this.gpsCoordsHud.textContent = currentLat.toFixed(6) + "° N, " + currentLng.toFixed(6) + "° E";
 
-                // Sync Leaflet Map Marker and Viewport
                 if (this.leafletMap && this.playerMarker) {
                     const latlng = [currentLat, currentLng];
                     this.playerMarker.setLatLng(latlng);
@@ -1130,7 +1214,7 @@
                     fw.wheel.rotation.x += this.car.speed * 1.5;
                 });
                 this.car.rearWheels.forEach(rw => {
-                    rw.rotation.x += this.car.speed * 1.5;
+                    rw.wheel.rotation.x += this.car.speed * 1.5;
                 });
 
                 this.car.mesh.position.copy(this.car.pos);
@@ -1195,6 +1279,12 @@
 
                 this.updateCarPhysics();
                 this.checkProximityTriggers();
+
+                // Shimmer reflecting fountain water pools
+                const time = Date.now() * 0.003;
+                this.fountainWaterMeshes.forEach((w, idx) => {
+                    w.position.y = 0.35 + Math.sin(time + idx) * 0.03;
+                });
 
                 for (let i = this.shards.length - 1; i >= 0; i--) {
                     const s = this.shards[i];
